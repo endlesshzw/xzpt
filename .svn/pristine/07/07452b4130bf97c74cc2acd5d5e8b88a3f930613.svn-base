@@ -1,0 +1,40 @@
+<template>
+	<div class="wrap">
+		<i class="el-icon-loading"></i>
+		<p style="margin-top: 10px;">正在跳转...</p>
+	</div>
+</template>
+
+<script>
+	import {ctx} from '../global'
+	export default{
+		data(){
+			return{
+				
+			}
+		},
+		mounted:function(){
+			document.title = "协作平台"
+			let token = res['body']['data']['accessToken']
+			let userId = JSON.parse(res['body']['data']['data']).uid
+			let userName = JSON.parse(res['body']['data']['data']).fullname
+			window.localStorage.setItem("ticket", token)
+			window.localStorage.setItem("userName", userName)
+			window.localStorage.setItem("userId", userId)
+			let ticket = localStorage.getItem("ticket")
+			this.$router.push({path: '/itemlist'})
+		},
+		
+	}
+</script>
+
+<style scoped>
+	i{
+		font-size: 30px;
+		text-align: center;
+	}
+	.wrap{
+		padding-top: 200px;
+		text-align: center;
+	}
+</style>

@@ -1,0 +1,246 @@
+<template>
+	<div class="dir" id="dir">
+		<div class="topTitle"><span class="text">愉快的创建一个任务</span></div>
+		<form id="formID" action="" method="post">
+			<p class="formTitle redstar">项目</p>
+			<el-input v-model="proj" placeholder="请输入项目名称"></el-input>
+			<p class="formTitle redstar">类型</p>
+			<el-select v-model="typeValue" placeholder="选择类型">
+			    <el-option
+			      v-for="item in types"
+			      :key="item.value"
+			      :label="item.label"
+			      :value="item.value">
+			    </el-option>
+		   </el-select>
+		   <p class="formTitle redstar">内容</p>
+		   <el-input
+			  type="textarea"
+			  :rows="5"
+			  :maxlength="240"
+			  placeholder="请输入内容"
+			  v-model="content">
+		   </el-input>
+		   <p class="formTitle">优先级</p>
+		   <el-select v-model="priorityValue" placeholder="选择优先级">
+			    <el-option
+			      v-for="item in priority"
+			      :key="item.value"
+			      :label="item.label"
+			      :value="item.value">
+			    </el-option>
+		   </el-select>
+		   <p class="formTitle">期望上线时间</p>
+		   <el-date-picker
+			    v-model="dateValue"
+			    type="date"
+			    placeholder="选择日期"
+			    :picker-options="pickerOptions0">
+		   </el-date-picker>	
+		   <p class="formTitle">附件</p>	
+		   <el-upload
+			  class="upload-demo"
+			  action="https://jsonplaceholder.typicode.com/posts/"
+			  :on-preview="handlePreview"
+			  :on-remove="handleRemove"
+			  :file-list="fileList">
+			  <el-button id="upload" size="small" type="primary">点击上传</el-button>
+			  <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+		   </el-upload>
+		   <p class="formTitle">讨论</p>	
+		   <el-input
+			  type="textarea"
+			  :rows="4"
+			  placeholder="讨论内容"
+			  v-model="discuss">
+		   </el-input>
+		   
+		   <p class="formTitle">邀请</p>	
+		   <div class="addressbox">
+		   	  <!--<div class="showPerson">
+		   	  	{{showLabel}}
+			   	  	
+		   	  </div>-->
+		   	  <!--<el-button class="rightfloat address" :plain="true" type="info" v-on:click="showAddress()">地址本</el-button>-->
+		   	  <!--<el-tree class="addressDialog"
+		   	  	  v-show="addressDialogShow"
+				  :data="data2"
+				  show-checkbox
+				  node-key="id"
+				  ref="tree"
+				  highlight-current
+				  :props="defaultProps"
+				  @check-change="handleCheckChange" 
+			  >
+			  </el-tree>-->
+				<!--<el-transfer
+				  	:props="{key:'id',label:'name'}"
+				  	:footer-format="{
+				      noChecked: '${total}',
+				      hasChecked: '${checked}/${total}'
+				      }" :titles="['全部', '邀请的人']" class="trans" filterable v-model="showLabel" :data="address">
+				</el-transfer>-->
+		   </div>
+		   <addressBook :showAddressBook="showAddressBook"></addressBook>
+		   <div class="createBtn"><el-button id="create" type="primary" @click="showAddressBook = true">&nbsp;&nbsp;创建&nbsp;&nbsp;</el-button></div>
+		</form>
+		
+		
+	</div>
+</template>
+
+<script>
+	import {ctx} from '../global'
+	import addressBook from './addressBook'
+export default {
+  name: 'hello',
+  components:{
+  	addressBook
+  },
+  data() {
+	return {
+		showAddressBook: false,
+		address:[],
+	  proj: '',                 //项目
+	  
+	  types: [{                //类型
+          value: '选项1',
+          label: '类型名称1'
+        }, {
+          value: '选项2',
+          label: '类型名称2'
+        }, {
+          value: '选项3',
+          label: '类型名称3'
+        }, {
+          value: '选项4',
+          label: '类型名称4'
+        }],
+      typeValue: '',
+      
+      content: '',               //输入内容
+      
+      priority: [{                //优先级
+          value: '选项1',
+          label: '优先级1'
+        }, {
+          value: '选项2',
+          label: '优先级2'
+        }, {
+          value: '选项3',
+          label: '优先级3'
+        }, {
+          value: '选项4',
+          label: '优先级4'
+        }],
+      priorityValue: '',
+      
+      pickerOptions0: {             //日期
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
+      dateValue: '',
+      
+      discuss: '',               //讨论内容
+      
+      fileList: [],
+      
+//    data2: [{
+//        id: 1,
+//        label: '一级 1',
+//        children: [{
+//          id: 4,
+//          label: '二级 1-1',
+//          children: [{
+//            id: 9,
+//            label: '三级 1-1-1'
+//          }, {
+//            id: 10,
+//            label: '三级 1-1-2'
+//          }]
+//        }]
+//      }, {
+//        id: 2,
+//        label: '一级 2',
+//        children: [{
+//          id: 5,
+//          label: '二级 2-1'
+//        }, {
+//          id: 6,
+//          label: '二级 2-2'
+//        }]
+//      }, {
+//        id: 3,
+//        label: '一级 3',
+//        children: [{
+//          id: 7,
+//          label: '二级 3-1'
+//        }, {
+//          id: 8,
+//          label: '二级 3-2'
+//        }]
+//      }],
+//      defaultProps: {
+//        children: 'children',
+//        label: 'label'
+//        
+//      },
+        showLabel: [],
+        addressDialogShow: false
+	}
+  },
+  created:function(){
+  	this.getUsers()
+  },
+  methods: {
+  	  getUsers(){
+  	  	this.$http.post( ctx + "/api/connuser/getUsers")
+  	  	.then(res=>{
+  	  		let data = res['body']['resultData']
+  	  		this.address = data
+  	  	},res=>{
+  	  		alert("获取用户失败")
+  	  	})
+  	  },
+      handleRemove(file, fileList) {
+          console.log(file, fileList);
+      },
+      handlePreview(file) {
+          console.log(file);
+      },
+      showAddress(){
+      	this.addressDialogShow = true
+      },
+//    handleCheckChange(data, checked, indeterminate) {
+//    	//console.log(data, checked, indeterminate)
+//    	
+//      if(checked==true && indeterminate==false){
+//      	return this.showLabel = data.label
+//      }
+//    }
+  }
+}
+
+</script>
+
+<style scoped>
+	.trans{
+		margin-top: 20px;
+		padding-left: 270px;
+	}
+	.showPerson{
+		height: 20px;
+	}
+	@import "../assets/css/banma.css";
+	.createBtn{
+		padding-bottom: 50px;
+	}
+	#upload,#create{
+		background-color: #40C19A;
+		border: none;
+	}
+	.topTitle{
+		position: initial;
+	}
+</style>

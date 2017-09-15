@@ -1,0 +1,187 @@
+ul,li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.leftfloat {
+	float: left;
+}
+.rightfloat {
+	float: right;
+}
+.topTitle {
+	height: 36px;
+	line-height: 36px;
+	background-color: #40c199;
+}
+.topTitle span.text {
+	color: #fff;
+	margin-left: 16px;
+}
+.dir form {
+	width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.dir form .formTitle {
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+.dir form .redstar:after {
+	content: "*";
+	color: red;
+}
+.addressbox {}
+.showPerson {
+	float: left;
+	width: 90%;
+	font-size: 14px;
+	padding: 0.7% 0 0.7% 1% ;
+	border: 1px solid #bfcbd9;
+	border-radius: 4px;
+	overflow: hidden;
+}
+.showPerson:focus {
+	outline: none;
+	border: 1px solid #4db3ff;
+}
+.createBtn {
+	clear: both;
+	padding-top: 32px;
+	text-align: center;
+}
+
+.searchbox {
+	color: #fff;
+	margin-right: 16px;
+}
+.searchbox .el-input {
+	float: right;
+	width: 180px;
+}
+.addressDialog {
+	clear: both;
+}
+.addProgress {
+	width: 42px;
+	height: 36px;
+}
+.addProgress i {
+ 	vertical-align: middle;
+    margin-top: -5px;
+    margin-left: -2px;
+ }
+.touxiang {
+	display: inline-block;
+	width: 42px;	
+	height: 42px;
+	border-radius: 50%;
+	
+}
+.comments {
+	margin-top: 16px;
+	margin-bottom: 50px;
+}
+.comments p.title {
+	margin-bottom: 16px;
+}
+.comlist {
+	padding-bottom: 24px;
+	margin-top: 16px;
+	border-bottom: 1px solid #ddd;
+}
+.comlistTitle {
+	height: 42px;
+}
+.comlistTitle img.touxiang {
+	display: inline-block;
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+}
+.comlistTitle span {
+	font-size: 14px;
+	line-height: 42px;
+	color: #40c199;
+	margin-left: 10px;
+	margin-right: 8px;
+}
+.comlistTitle span.pltime {
+	color: #999;
+}
+.comlistTitle button.replybtn,
+.comlistTitle button.delbtn {
+	cursor: pointer;
+	border: 0;
+	color: #40c199;
+	line-height: 42px;
+	background-color: transparent
+}
+.comlistContent {
+	clear: both;
+	width: 1100px;
+	font-size: 14px;
+	color: #666;
+	line-height: 20px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.replybox {
+	width: 1068px;
+	padding: 16px;
+	margin: 14px auto 0;
+	background-color: #f3f3f3;
+}
+.replybox li {
+	margin-bottom: 20px;
+}
+.replybox2 {
+	padding: 0;
+	width: 970px;
+}
+.comlistContent2 {
+	width: 966px;
+}
+.comlistContent3 {
+	width: 866px;
+}
+.commentsInput {
+	width: 1100px;
+	margin: 16px auto 0;
+	overflow: hidden;
+}
+.commentsInput .el-button {
+	margin-left: 14px;
+	margin-top: 14px;
+}
+.timeTable {
+	width: 622px; 
+	margin-top: 39px;
+	border: 1px solid #dfe6ec;
+}
+.timeTable li {
+	height: 40px;
+	line-height: 40px;
+}
+.timeTable li:first-child {
+	background-color: #dfe6ec;
+	border-bottom: 1px solid #eef1f6;
+}
+.timeTable li > span {
+	width: 25%;
+	display: block;
+	float: left;
+	text-align: center;
+	font-size: 14px;
+}
+.timeTable li:first-child > span {
+	color: #333;
+	font-weight: bold;
+}
+.timeTable li .el-progress {
+	width: 120px;
+    margin-left: 15px;
+	margin-top: 10px;
+}
+
+

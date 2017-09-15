@@ -1,0 +1,75 @@
+.rightfloat {
+	float: right;
+}
+.topTitle {
+	height: 36px;
+	line-height: 36px;
+	background-color: #40c199;
+}
+.topTitle span.text {
+	color: #fff;
+	margin-left: 16px;
+}
+.dir form {
+	width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.dir form .formTitle {
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+.dir form .redstar:after {
+	content: "*";
+	color: red;
+}
+.addressbox {}
+.showPerson {
+	float: left;
+	width: 90%;
+	font-size: 14px;
+	padding: 0.7% 0 0.7% 1% ;
+	border: 1px solid #bfcbd9;
+	border-radius: 4px;
+	overflow: hidden;
+}
+.showPerson:focus {
+	outline: none;
+	border: 1px solid #4db3ff;
+}
+.createBtn {
+	clear: both;
+	padding-top: 32px;
+	text-align: center;
+}
+
+.searchbox {
+	color: #fff;
+	margin-right: 16px;
+}
+.searchbox .el-input {
+	float: right;
+	width: 180px;
+}
+.addressDialog {
+	clear: both;
+	/*position: fixed;
+	left: 50%;
+	top: 50%;
+	z-index: 1;
+	width: 600px;
+	height: 400px;
+	margin-top: -200px;
+	margin-left: -300px;*/
+}
+/*.addressDialog:before {
+	content: "";
+	position: fixed;
+	top:0;
+	left: 0;
+	z-index: -1;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	opacity: 0.5;
+}*/

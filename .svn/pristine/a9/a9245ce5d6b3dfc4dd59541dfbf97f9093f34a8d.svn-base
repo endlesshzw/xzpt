@@ -1,0 +1,54 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+//import Home from '@/components/Home'
+import directory from '@/components/directory'
+import itemlist from '@/components/itemlist'
+import login from '@/components/login'
+//import details from '@/components/details'
+//import wechat from '@/components/wechat'
+import banmaTable from '@/components/banmaTable'
+
+Vue.use(Router)
+
+export default new Router({
+  routes: [
+    {
+    	path: '/banmaTable',
+    	name: 'BanmaTable',
+    	component: banmaTable
+    },
+    {
+      path: '/',
+      redirect:'/login',
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: login
+    },
+    {
+      path: '/directory',
+      name: 'Directory',
+      component: directory,
+      meta:{requireAuth: true}
+    },
+    {
+      path: '/itemlist',
+      name: 'Itemlist',
+      component: itemlist,
+      meta:{requireAuth: true}
+    }
+//  {
+//    path: '/details',
+//    name: 'Details',
+//    component: details
+//  },
+//  {
+//    path: '/wechat',
+//    name: 'Wechat',
+//    component: wechat
+//  },
+    
+    
+  ]
+})

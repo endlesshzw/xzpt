@@ -1,0 +1,31 @@
+<template>
+	<div id="timetable" class="rightfloat" style="margin-bottom: 32px;">
+    	<ul class="timeTable">
+    		<li>
+    			<span class="span1">创建时间</span>
+    			<span class="span2">期望上线时间</span>
+    			<span class="span3">完成时间</span>
+    			<span class="span4">耗时</span>
+    		</li>
+    		<li>
+    			<span> {{ showTimes.createdDate }} </span>
+    			<span> {{ showTimes.expectedDate }} </span>
+    			<span>&nbsp;</span>
+    			<span> 
+    				<el-progress :text-inside="true" :stroke-width="18" :status="colors" :percentage="showTimes.percent"></el-progress> 
+    			</span>
+    		</li>
+    	</ul>
+    </div>
+</template>
+
+<script>
+	export default {
+		name: 'timetable',
+		props: ['showTimes']   //从父组件中接收数据的方法
+	}
+</script>
+
+<style>
+	@import "../assets/css/banma.css";
+</style>

@@ -1,0 +1,95 @@
+<template>
+	<div class="wrap">
+		<div class="loginWrap">
+			<el-input autofocus v-model="userName" placeholder="请输入账号"></el-input>
+			<el-input @keyup.enter.native="connect" style="margin: 10px 0;" type="password" v-model="psw" placeholder="请输入密码"></el-input>
+			<el-button id="loginBtn" type="primary" @click="connect">登录</el-button>
+			<!--<el-button type="primary" @click="test">test</el-button>-->
+			<!--<el-button type="warning" @click="clear">clear</el-button>-->
+			<el-dialog
+			  title="提示"
+			  :visible.sync="dialogVisible"
+			  size="tiny">
+			  <span>{{errorMsg}}</span>
+			  <span slot="footer" class="dialog-footer">
+			    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+			  </span>
+			</el-dialog>
+		</div>
+	</div>
+		
+	
+		
+</template>
+
+<script>
+	import {ctx} from '../global'
+	export default{
+		data(){
+			return{
+				dialogVisible: false,
+				loginUrl: ctx + '/token/accessToken',
+				userName:'',
+				psw:'',
+				errorMsg:''
+			}
+		},
+		mounted:function(){
+			document.title = "协作平台"
+		},
+		methods:{
+			connect(){
+				this.login()
+			},
+			login(){
+				this.$http.post(this.loginUrl,
+					{
+					  "appid": "16101_10",
+					  "grantType": "client_credential",
+					  "loginFlag": "mobile",
+					  "password": this.psw,
+					  "username": this.userName
+					},
+				).then(res=>{
+					console.log(res['body']['code'])
+					if (res['body']['code']=="0") {
+						let token = res['body']['data']['accessToken']
+						let userId = JSON.parse(res['body']['data']['data']).uid
+						let userName = JSON.parse(res['body']['data']['data']).fullname
+						window.localStorage.setItem("ticket", token)
+						window.localStorage.setItem("userName", userName)
+						window.localStorage.setItem("userId", userId)
+						let ticket = localStorage.getItem("ticket")
+						this.$router.push({path: '/itemlist'})
+					}else{
+						this.errorMsg = res['body']['msg']
+						this.dialogVisible = true
+					}
+				},res=>{
+					
+				})
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.wrap{
+		height: 100%;
+		width: 100%;
+		background-image: url(../assets/img/bg.jpg);
+		background-size: 100%;
+		background-repeat: no-repeat;
+	}
+	#loginBtn{
+		width: 300px;
+	}
+	.loginWrap{
+		border-radius: 10px;
+		/*border: 1px solid #40C199;*/
+		padding: 50px;
+		width: 300px;
+		padding-top: 200px;
+		margin: 0 auto;
+	}
+</style>

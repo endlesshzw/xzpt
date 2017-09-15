@@ -1,0 +1,251 @@
+<template>
+	<div id="comment">
+		<el-input type="textarea" :rows="5" placeholder="随便说点儿什么吧" v-model="oneReplyContent"></el-input>
+		<el-button class="rightfloat" :plain="true" type="primary" @click="oneReplyBtnOk">&nbsp;评论&nbsp;</el-button>
+		<el-button class="rightfloat" :plain="true" type="primary" @click="oneReplyBtnCancel">&nbsp;清空&nbsp;</el-button>
+		<ul>
+	    	<li class="comlist" v-for="(chat,index) in chatLists" :index="index">
+	    		<div class="comlistTitle">
+			    	<img class="touxiang leftfloat" :src="chat.headImg" :onerror="defaultImg"/>
+			    	<span class="leftfloat"> {{ chat.userName }} </span>
+			    	<span class="leftfloat pltime"> {{ chat.createdDate }} </span>    <!-- $event 需要访问DOM事件，当前元素的事件-->
+			    	<button v-if="chat.userId == logUserId" class="leftfloat replybtn" @click="thirdReplyTextDelBtn(chat.id)" >删除</button>
+			    	<button v-else class="leftfloat replybtn" @click="thirdReplyTextBtn(chat,$event)" >回复</button>
+		    	</div>
+		    	<div class="comlistContent"> {{ chat.content }} </div>
+		    	<div v-show="chat.show" class="commentsInput" >  
+		    		<replyBox v-on:replyReplyer="getReplyContent($event,chat.id)"></replyBox>
+		    	</div>
+		    	<ul v-if="chat['caseChatToUsers'].length > 0" class="replybox">
+		    		<li v-for="twochat in chat['caseChatToUsers']">
+		    			<div v-if="twochat.parentId == '0'">
+		    			<div class="comlistTitle" >
+					    	<img class="touxiang leftfloat" :src="twochat.headImg" :onerror="defaultImg"/>
+					    	<span class="leftfloat"> {{ twochat.userName }} </span>
+					    	<span class="leftfloat pltime"> {{ twochat.createdDate }} </span>
+					    	<button v-if="twochat.userId==logUserId" class="leftfloat delbtn" @click="replyReplyerDelBtn(twochat.id)">删除</button>
+					    	<button v-else class="leftfloat delbtn" @click="replyReplyerBtn(twochat,$event)">回复</button>
+				    	</div>
+				    	<div class="comlistContent comlistContent2"> {{ twochat.content }} </div>
+				    	<div v-show="twochat.show" class="commentsInput" style="width: 966px;">
+				    		<replyBox v-on:replyReplyer="getReplyReplyerContent($event, twochat.id, twochat.userId, twochat.userName)"></replyBox>
+				    	</div>
+				    	<ul class="replybox replybox2">
+				    		<li v-for="thirdchat in twochat['replyChild']">
+						    	<div class="comlistTitle">
+							    	<img class="touxiang leftfloat" :src="thirdchat.headImg" :onerror="defaultImg"/>
+							    	<span class="leftfloat"> {{ thirdchat.userName }} </span>
+							    	<span class="leftfloat" style="color: #333;">回复： {{ twochat.userName }} </span>
+							    	<span class="leftfloat pltime"> {{ thirdchat.createdDate }} </span>
+							    	<button v-if="thirdchat.userId==logUserId" class="leftfloat delbtn" @click="replyReplyerDelBtn(thirdchat.id)">删除</button>
+					    			<button v-else class="leftfloat delbtn" @click="replyReplyerReplyerBtn(thirdchat,$event)">回复</button>
+						    	</div>
+						    	<div class="comlistContent comlistContent3"> {{ thirdchat.content }} </div>
+						    	
+						    	<div v-show="thirdchat.show" class="commentsInput" style="width: 870px;">
+						    		<replyBox v-on:replyReplyer="getReplyerChildContent($event, twochat.id, twochat.userId, twochat.userName)"></replyBox>
+						    	</div>
+						    	
+					    	</li>
+				    	</ul>
+				    	</div>
+		    		</li>
+	    		</ul>
+	    		
+	    	</li>
+	    </ul>	
+    </div>
+</template>
+		
+<script>
+	import replyBox from './replyBox'
+	import {ctx} from '../global'
+	
+	export default {
+		name: 'comment',
+		components: {
+			replyBox
+		},
+		data: function(){
+			return {
+				item: '?caseId=' + this.$route.query.id,
+				logUserId: localStorage.getItem("userId"),
+				chatListUrl: ctx + '/api/connuser/getChatLists',     //获取评论
+				chatLists: [],
+				oneReplyContent: '',
+				show: false,
+				defaultImg: 'this.src="' + require('../assets/img/noPic.png') + '"'
+			}
+		},
+		mounted: function(){
+			this.getChatLists();
+		},
+		methods:{
+			//获取评论数据   
+			getChatLists: function(){      
+				this.$http.get(this.chatListUrl + this.item).then(response=>{          
+	    			let chatListData = response['body']['resultData']
+
+					for(let i in chatListData){  //把show:false加入到接口数据chatListData中
+						chatListData[i].show=false;
+						
+						let caseChatToUsers = chatListData[i]["caseChatToUsers"];
+						for(let j in caseChatToUsers){
+							caseChatToUsers[j].show=false;
+							
+							let replyChild  = caseChatToUsers[j]["replyChild"]
+							for(let k in replyChild){
+								replyChild[k].show=false;
+							}
+						}
+					}
+	    			this.chatLists = chatListData    //一级评论数据
+	    			
+	    			
+	    			
+	    			for( let n in chatListData){ 
+						chatListData[n].headImg = 'http://119.29.72.102:11000' + chatListData[n].headImg
+						for( let m in chatListData[n].caseChatToUsers){ 
+							chatListData[n].caseChatToUsers[m].headImg = 'http://119.29.72.102:11000' + chatListData[n].caseChatToUsers[m].headImg
+							for( let h in chatListData[n].caseChatToUsers[m].replyChild){ 
+								chatListData[n].caseChatToUsers[m].replyChild[h].headImg = 'http://119.29.72.102:11000' + chatListData[n].caseChatToUsers[m].replyChild[h].headImg
+							}
+						}
+					}
+	    			
+	    			console.log(JSON.stringify(chatListData))
+				},response => {
+					alert("获取数据失败");
+				})
+			},
+			//点击一级评论。提交内容
+			oneReplyBtnOk: function(){  
+				let url = ctx + '/api/connuser/saveComment';
+				if(this.oneReplyContent != "" ){
+					this.$http.get(url + this.item + "&content=" + this.oneReplyContent).then(response=>{ 
+						this.getChatLists()
+					},response => {
+						alert("获取数据失败");
+					})
+					this.oneReplyContent = ""
+				}else{
+					this.$alert('请输入内容才能评论哦', '班MA提示', {
+			          confirmButtonText: '确定',
+			        });
+				}
+			},
+			oneReplyBtnCancel: function(){
+				this.oneReplyContent = ""
+			},
+			//点击 二级回复按钮
+			thirdReplyTextBtn: function(item){    
+				item.show =! item.show
+				let tc = event.target.textContent   //获取当前点击事件元素的文本 ，类似于Jquery的$(this).text()
+				if(item.show == true){
+					event.target.textContent = "收起回复"
+				}else{
+					event.target.textContent = "回复"
+				}
+			},
+			
+			//将回复的评论保存到数据接口中
+			getReplyContent: function(content,id){
+				let url = ctx +'/api/connuser/replyComment'    //回复评论接口
+				if(content != ""){     //调用接口时，第一个参数要用问号
+					this.$http.get(url + "?chatId="+ id + "&userId=" + this.logUserId + "&content=" + content).then(response=>{ 
+						this.getChatLists()
+					},response => {
+						alert("获取数据失败");
+					})
+				}else{
+					this.$alert('请输入内容才能评论哦', '班MA提示', {
+			          confirmButtonText: '确定'
+			        });
+				}
+		   },
+		   //删除评论
+		   thirdReplyTextDelBtn: function(chatId){
+		   	    let url = ctx + '/api/connuser/delComment'
+		   	    this.$http.get(url + "?chatId=" + chatId).then(response=>{
+		   	    	this.getChatLists()
+		   	    },response=>{
+		   	    	alert("获取数据失败");
+		   	    })
+		   },
+		   
+		   //点击三级回复按钮
+		    replyReplyerBtn: function(item){    
+				item.show =! item.show
+				let tc = event.target.textContent   
+				if(tc == "回复"){
+					event.target.textContent = "收起回复"
+				}else{
+					event.target.textContent = "回复"
+				}
+			},
+			//将新的数据保存进回复回复人接口中
+			getReplyReplyerContent: function(content,parentId,replyerId,replyerName){
+				let url = ctx +'/api/connuser/replyToReplyer'    
+				if(content != ""){         
+					this.$http.get(url+this.item+"&parentId="+parentId+"&replyerId="+replyerId+"&replyerName="+replyerName+"&content="+content).then(response=>{ 
+						this.getChatLists()
+					},response => {
+						alert("获取数据失败");
+					})
+				}else{
+					this.$alert('请输入内容才能评论哦', '班MA提示', {
+			          confirmButtonText: '确定'
+			        });
+				}
+		   },
+		   //删除回复
+		   replyReplyerDelBtn: function(replyId){
+		   	    let url = ctx + '/api/connuser/delReplyComment'
+		   	    this.$http.get(url + "?replyId=" + replyId).then(response=>{
+		   	    	this.getChatLists()
+		   	    },response=>{
+		   	    	alert("获取数据失败");
+		   	    })
+		   },
+		   
+		   //点击四级回复按钮
+		    replyReplyerReplyerBtn: function(item){    
+				item.show =! item.show
+				let tc = event.target.textContent   
+				if(tc == "回复"){
+					event.target.textContent = "收起回复"
+				}else{
+					event.target.textContent = "回复"
+				}
+			},
+			getReplyerChildContent: function(content,parentId,replyerId,replyerName){   //回复 回复回复人 接口跟上面一样
+				let url = ctx +'/api/connuser/replyToReplyer'    
+				if(content != ""){         
+					this.$http.get(url+this.item+"&parentId="+parentId+"&replyerId="+replyerId+"&replyerName="+replyerName+"&content="+content).then(response=>{ 
+						this.getChatLists()
+					},response => {
+						alert("获取数据失败");
+					})
+				}else{
+					this.$alert('请输入内容才能评论哦', '班MA提示', {
+			          confirmButtonText: '确定'
+			        });
+				}
+		   },
+		   
+		   //删除回复人回复
+			
+			
+		}
+	}
+</script>
+
+<style scoped>
+	button:focus {
+		outline: none;
+	}
+	.el-button {
+		margin-top: 12px;
+		margin-left: 12px;
+	}
+</style>

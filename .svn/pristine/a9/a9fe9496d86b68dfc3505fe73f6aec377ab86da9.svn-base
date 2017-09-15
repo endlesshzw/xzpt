@@ -1,0 +1,199 @@
+<template>
+	<div class="dir" id="dir">
+		<div class="topTitle"><span class="text">愉快的创建一个任务</span></div>
+		<form id="formID" action="" method="post">
+			<p class="formTitle redstar">项目</p>
+			<el-input v-model="proj" placeholder="请输入项目名称"></el-input>
+			<p class="formTitle redstar">类型</p>
+			<el-select v-model="typeValue" placeholder="选择类型">
+			    <el-option
+			      v-for="item in types"
+			      :key="item.value"
+			      :label="item.label"
+			      :value="item.value">
+			    </el-option>
+		   </el-select>
+		   <p class="formTitle redstar">内容</p>
+		   <el-input
+			  type="textarea"
+			  :rows="5"
+			  :maxlength="240"
+			  placeholder="请输入内容"
+			  v-model="content">
+		   </el-input>
+		   <p class="formTitle">优先级</p>
+		   <el-select v-model="priorityValue" placeholder="选择优先级">
+			    <el-option
+			      v-for="item in priority"
+			      :key="item.value"
+			      :label="item.label"
+			      :value="item.value">
+			    </el-option>
+		   </el-select>
+		   <p class="formTitle">期望上线时间</p>
+		   <el-date-picker
+			    v-model="dateValue"
+			    type="date"
+			    placeholder="选择日期"
+			    :picker-options="pickerOptions0">
+		   </el-date-picker>	
+		   <p class="formTitle">附件</p>	
+		   <el-upload
+			  class="upload-demo"
+			  action="https://jsonplaceholder.typicode.com/posts/"
+			  :on-preview="handlePreview"
+			  :on-remove="handleRemove"
+			  :file-list="fileList">
+			  <el-button id="upload" size="small" type="primary">点击上传</el-button>
+			  <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+		   </el-upload>
+		   <p class="formTitle">讨论</p>	
+		   <el-input
+			  type="textarea"
+			  :rows="4"
+			  placeholder="讨论内容"
+			  v-model="discuss">
+		   </el-input>
+		   
+		   <p class="formTitle">
+		   	邀请
+		   	<el-button type="primary" size="small" @click="showAddressBook = true">地址本</el-button>
+		   </p>
+		   <div class="choosenOne">
+		   		<el-button v-for="(item, index) in choosenOne" type="primary">{{item.name}}</el-button>
+		   </div>
+		   <addressBook @getTargetData = "getTargetData" @closeDia = "closeDia" :showAddressBook.sync="showAddressBook"></addressBook>
+		   <div class="createBtn"><el-button id="create" type="primary">&nbsp;&nbsp;创建&nbsp;&nbsp;</el-button></div>
+		</form>
+		
+		
+	</div>
+</template>
+
+<script>
+	import {ctx} from '../global'
+	import addressBook from './addressBook'
+export default {
+  components:{
+  	addressBook
+  },
+  data() {
+	return {
+		choosenOne: [],
+		showAddressBook: false,
+		address:[],
+	  	proj: '',                 //项目
+	  
+	  	types: [{                //类型
+          value: '选项1',
+          label: '类型名称1'
+        }, {
+          value: '选项2',
+          label: '类型名称2'
+        }, {
+          value: '选项3',
+          label: '类型名称3'
+        }, {
+          value: '选项4',
+          label: '类型名称4'
+        }],
+      	typeValue: '',
+      
+     	content: '',               //输入内容
+      
+        priority: [{                //优先级
+          value: '选项1',
+          label: '优先级1'
+        }, {
+          value: '选项2',
+          label: '优先级2'
+        }, {
+          value: '选项3',
+          label: '优先级3'
+        }, {
+          value: '选项4',
+          label: '优先级4'
+        }],
+        priorityValue: '',
+      
+        pickerOptions0: {             //日期
+        disabledDate(time) {
+          		return time.getTime() < Date.now() - 8.64e7;
+        	}
+      	},
+      	dateValue: '',
+      
+      	discuss: '',               //讨论内容
+      
+     	fileList: []
+//      addressDialogShow: false
+	}
+  },
+  created:function(){
+  	this.getUsers()
+  },
+  methods: {
+		getTargetData(val){
+			this.choosenOne = val
+		},
+  		closeDia(val){
+  			this.showAddressBook = val
+  		},
+  	  getUsers(){
+  	  	this.$http.post( ctx + "/api/connuser/getUsers")
+  	  	.then(res=>{
+  	  		let data = res['body']['resultData']
+  	  		this.address = data
+  	  	},res=>{
+  	  		alert("获取用户失败")
+  	  	})
+  	  },
+      handleRemove(file, fileList) {
+          console.log(file, fileList);
+      },
+      handlePreview(file) {
+          console.log(file);
+      },
+//    showAddress(){
+//    	this.addressDialogShow = true
+//    },
+//    handleCheckChange(data, checked, indeterminate) {
+//    	//console.log(data, checked, indeterminate)
+//    	
+//      if(checked==true && indeterminate==false){
+//      	return this.showLabel = data.label
+//      }
+//    }
+  }
+}
+
+</script>
+
+<style scoped>
+	.choosenOne button{
+		margin: 4px;
+	}
+	.choosenOne{
+		border: 1px solid #bfcbd9;
+		padding: 10px;
+		border-radius: 10px;
+	}
+	.trans{
+		margin-top: 20px;
+		padding-left: 270px;
+	}
+	.showPerson{
+		height: 20px;
+	}
+	@import "../assets/css/banma.css";
+	.createBtn{
+		padding-bottom: 50px;
+	}
+	#upload,#create{
+		background-color: #40C19A;
+		border: none;
+	}
+	.topTitle{
+		position: initial;
+	}
+</style>

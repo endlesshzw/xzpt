@@ -1,0 +1,139 @@
+<template>
+	<div id="itemList">
+		<div class="topTitle">
+			<span class="text">快乐工作 全员参与</span>
+			 <!--<el-button class="Btns" size="small">
+			 	<a href="#">配单</a>
+			 	<router-link :to="{name: 'Details'}">&nbsp;配单&nbsp;</router-link>
+			 </el-button>-->
+			 <!--<el-button class="Btns" size="small">-->
+			 	<!--<a href="#">录单</a>-->
+
+        <el-button type="text" class="Btns el-button el-button--small" @click="toAdd">&nbsp;录单&nbsp;</el-button>
+      <!--<router-link class="Btns el-button el-button--small" @click="dialogVisible = true">&nbsp;录单&nbsp;</router-link>-->
+              
+          <!--</el-button>-->
+			<div class="rightfloat searchbox">在全部中搜索：
+				<el-input
+				  size="small"
+				  placeholder="请输入内容"
+				  icon="search"
+				  v-model="inputSearch"
+				  :on-icon-click="handleIconClick">
+				</el-input>
+			</div>
+		</div>
+		<el-tabs id="tabSwitch" v-model="activeName" @tab-click="handleClick">
+
+		    <el-tab-pane label="我的项目" name="0"></el-tab-pane>
+		    <el-tab-pane label="我参与但未解决的" name="1"></el-tab-pane>
+		    <el-tab-pane label="我参与的" name="2"></el-tab-pane>
+		    <el-tab-pane label="我发起的" name="3"></el-tab-pane>
+		</el-tabs>
+		<banmaTable
+			ref="proTable"
+			:tabName="name"
+			:activeName = "activeName"
+			:inputSearch= "inputSearch">
+		</banmatable>
+    <el-dialog
+      title="请选择要创建的问题单类型"
+      :visible.sync="dialogVisible"
+      size="large" >
+      <casetype @dialogHide="dialogHide" :caseType="caseType"></casetype>
+      <!--<span slot="footer" class="dialog-footer">
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+  </span>-->
+    </el-dialog>
+	</div>
+	
+
+</template>
+
+
+<script>
+	import banmaTable from './banmaTable'     //引入当前目录中的banmaTable.vue组件
+    import casetype from './casetype'
+    import directory from './directory'
+  //	import Details from './details'
+	export default {
+		name: 'itemList',
+		data() {
+			return {
+				keyWord: '',
+				tabUrl: '',
+				inputSearch: '',
+				activeName: '0',
+				name:'0',
+        		dialogVisible: false
+
+			}
+		},
+		methods: {
+			toAdd(){
+				this.$router.push({ name: 'Directory'})
+			},
+			handleIconClick(ev) {
+				this.keyWord = this.inputSearch
+				this.activeName = ''
+				this.$refs.proTable.searchFunc(this.keyWord)
+		   },
+		    handleClick(tab, event) {
+		        this.name = tab.name
+		    },
+		    dialogHide(){
+		    	//alert(msg);
+		    	this.dialogVisible = false;
+		    	
+		    	//this.$router.push({path: '/Details',target:"_blank"});
+		    }
+		},
+		components: {
+			banmaTable,casetype,directory
+		},
+	    handleClose(done) {
+	      this.$confirm('确认关闭？')
+	        .then(_ => {
+	          done();
+	        })
+	        .catch(_ => {});
+	    }
+	}
+</script>
+
+<style>
+	@import "../assets/css/banma.css";
+</style>
+<style>
+	#tabSwitch{
+		padding-top: 36px;
+	}
+	.el-tabs__nav .el-tabs__item.is-active{
+		color: #40c19a;
+	}
+	.el-tabs__nav .el-tabs__active-bar{
+		background-color: #40c19a;
+	}
+	.topTitle{
+		width: 100%;
+		z-index: 9;
+		position: fixed;
+	}
+	.topTitle .Btns {
+		border: none;
+		text-align: center;
+		font-size: 14px;
+		color: #333;
+		margin-left: 6px;
+		background-color: #fff;
+	}
+	.Btns {
+		color: #333;
+		text-decoration: none;
+	}
+	.Btns:hover {
+		border: none;
+		background-color: #eee;
+	}
+</style>

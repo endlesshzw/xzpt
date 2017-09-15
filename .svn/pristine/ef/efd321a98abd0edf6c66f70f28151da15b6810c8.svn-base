@@ -1,0 +1,417 @@
+<template>
+	<div id="deTails">
+		<div class="topTitle">
+			<span class="text">{{ sn }}</span>
+	    </div>
+	    <div style="width: 1200px; margin: 16px auto 0;">
+		    <div class="leftfloat" style="margin-bottom: 32px;">
+		    	<span>进展状态：</span>
+				<el-button v-if="addBtnShow" class="addProgress" type="primary" icon="edit" @click="selectShow">	
+				</el-button>
+				<div v-else style="display: inline-block;">
+					<el-select v-model="typeValue" placeholder="请选择状态">
+					    <el-option
+					      v-for="item in options"
+					      :key="item.id"
+					      :label="item.name"
+					      :value="item.name">
+					    </el-option>
+			    	</el-select>
+			    	<el-button :plain="true" type="primary" @click="addStatus">&nbsp;确定&nbsp;</el-button>
+			    	<el-button :plain="true" type="primary" @click="cancelStatus" style="margin-right: 10px;">&nbsp;取消&nbsp;</el-button>
+				</div>
+				<el-button class="unfoldBtn" type="primary" @click="toggle($event)" >
+		    		<i class="el-icon-arrow-down" v-bind:class="{'el-icon-arrow-down': isDown, 'el-icon-arrow-up': !isDown }"></i>
+		    		&nbsp;{{ upAndDown }}&nbsp;
+		    	</el-button>
+		    	<el-table v-show="statusTableShow" :data="tableData" style="width: 550px; margin-top: 16px;">
+			        <el-table-column prop="name" label="状态"></el-table-column>
+			        <el-table-column prop="opt_date" label="时间"></el-table-column>
+			    </el-table>
+		    </div>
+		    <time-table v-bind:show-times="caseData"></time-table>
+		    <div style="clear: both; border-top: 1px solid #ddd; margin-top: 16px; padding-top: 16px;">
+		    	<div class="editItems">
+		    		<img class="leftfloat touxiang" :src="reportHeadImg">
+		    		<span class="leftfloat editName"> {{reportUserName}} </span>
+		    		<span class="leftfloat editTime"> {{ reportTime }} </span>
+		    		<el-button class="addProgress" type="primary" icon="edit" @click="textareaShowBtn">
+		    		</el-button>
+		    		<div style="margin-top: 8px;margin-left: 50px;"> {{ content }} </div>
+		    		<div v-show="textareaShow" class="editTextarea">
+		    			<el-input type="textarea" :rows="4" v-model="textareaContent" ></el-input>
+		    			<el-button class="rightfloat" :plain="true" type="primary" @click="okEditText">&nbsp;确定&nbsp;</el-button>
+			    	    <el-button class="rightfloat" :plain="true" type="primary" @click="cancelEditText">&nbsp;取消&nbsp;</el-button>
+		    		</div>
+		    		
+		    		<ul class="itemtype">
+		    			<li>类型：
+		    				<span> {{ typeName }} </span>
+		    				<el-button v-show="thisBtn" class="addProgress" type="primary" icon="edit" @click="itemTypeBtn">
+		    				</el-button>
+		    				<div v-show="itemTypeShow" style="display: inline-block;">
+								<el-select v-model="typeValue1" placeholder="请选择类型">
+								    <el-option
+								      v-for="item in options1"
+								      :key="item.id"
+								      :label="item.name"
+								      :value="item.id">
+								    </el-option>
+						    	</el-select>
+						    	<el-button :plain="true" type="primary" @click="changeTypeBtnOk">&nbsp;确定&nbsp;</el-button>
+						    	<el-button :plain="true" type="primary" @click="changeTypeBtnCancel">&nbsp;取消&nbsp;</el-button>
+							</div>
+		    			</li>
+		    			<li>优先级：&nbsp; {{ youXianJi }} </li>
+		    			<li>归属项目：&nbsp;{{ guiShuXiangMu }} </li>
+		    			<li>项目负责人： &nbsp;{{ fuZeRen }} </li>
+		    		</ul>
+		    	</div>
+		    </div>
+		    <hr>
+		    <div style="padding-top: 16px;">
+		    	<span>参与的人</span>
+		    	<el-button class="addProgress" type="primary" icon="edit" @click="">
+		    	</el-button>
+		    	<ul class="personUl">
+		    		<li v-for="item in person">
+		    			<img :src="item.headImg"> 
+		    			<span> {{ item.userName }} </span>
+		    		</li>
+		    	</ul>
+		    </div>
+		    <hr>
+		    <div class="attachment">
+		    	<span class="leftfloat">附件（最大2G）</span>
+		    	<el-upload
+				  class="upload-demo"      
+				  action="https://jsonplaceholder.typicode.com/posts/"   
+				  :on-preview="handlePreview"
+				  :on-remove="handleRemove"
+				  :file-list="fileList">
+				  <el-button size="small" type="primary">点击上传</el-button>
+				  <!--<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+				</el-upload>
+				<!--action：上传的地址 。file-list：上传的文件列表-->
+		    </div>
+		    <hr>
+		    <div class="comments">
+		    	<el-tabs v-model="activeName" @tab-click="handleClick">
+				    <el-tab-pane :class="tab-title" label="评论" name="first">
+				    	<!--引用子组件，将三个值传给子组件-->
+				    	<commentList 
+				    		:ctx="ctx" 
+				    		:item="item" 
+				    		:logUserId="logUserId">
+				    	</commentList>
+				    </el-tab-pane>
+				    <el-tab-pane class="tab-title" label="其他1" name="second">其他1</el-tab-pane>
+				    <el-tab-pane class="tab-title" label="其他2" name="third">其他2</el-tab-pane>
+				</el-tabs>
+		    	
+		    </div>
+	    </div>
+	   
+	</div>
+</template>
+
+<script>
+	import timeTable from './timeTable'
+	import commentList from './commentList'
+	import {ctx} from '../global'
+	
+	export default {
+		name: 'deTails',
+		components: {
+			timeTable,
+			commentList
+		},
+		data: function(){
+			return {      
+    			item: '?caseId=' + this.$route.query.id,   //配单id
+    			logUserId: localStorage.getItem("userId"),             //假设登录的用户是小乔的id
+				changeStatusUrl: ctx + '/api/connuser/getCaseDetail.json',      //改变进展状态select中的数据接口
+				historyStatusUrl: ctx + '/api/connuser/getStatusLogByCaseId.json', //进展状态 历史数据接口 
+				caseTypeUrl: ctx + '/api/connuser/getCaseTypes',             //获取类型
+				caseUserUrl: ctx + '/api/connuser/getCaseUsers',             //获取参与人员
+				chatListUrl: ctx + '/api/connuser/getChatLists',             //获取评论
+				sn: '',
+				addBtnShow: true,
+				options: [],
+		        typeValue: '',
+		        tableData: [],
+		        upAndDown: '展开',
+		        statusTableShow: false,
+		        isDown: true,
+		        colors: '',
+		        caseData: '',
+		        reportHeadImg: '',
+		        reportUserName: '',
+		        reportTime: '',
+		        content: '',
+		        textareaShow: false,
+		        textareaContent: '',
+		        thisBtn: true,
+		        options1: [],
+		        typeName: '',
+		        typeValue1: '',
+		        itemTypeShow: false,
+		        youXianJi: '一级',
+		        guiShuXiangMu: '新境界',
+		        fuZeRen: '龙登攀',
+		        person: [],
+		        activeName: 'first',
+//		        chatLists: [],
+//				oneReplyContent: '',
+//				idTruecom: false,
+//				textarea3: '',
+//				replyOrDel: '删除',
+//				msg: logUserId,
+//				replyCommentText: '',
+//				replyCommentText1: '',
+				n: -1,
+				show:false,
+				fileList: [
+					{
+						name: 'food.jpeg', 
+						url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+					}, 
+					{
+						name: 'food2.jpeg', 
+						url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+					}
+				],
+			}
+		},
+		
+		methods: { 
+			changeStatus: function(){              //获取基本详情信息数据
+				let _this = this                   //把当前vue对象赋值给变量 _this
+				this.$http.get(_this.changeStatusUrl + _this.item).then(response=>{          
+	    			let data = response['body']['resultData']
+	    			
+	    			let typeData = data['caseStatus']
+	    			_this.options = typeData
+	    			
+	    			this.caseData = data['connuserCase']['connuserCase']
+	    			_this.sn = this.caseData.sn
+	    			_this.reportHeadImg = this.caseData.reportHeadImg
+	    			_this.reportUserName = this.caseData.reportUserName
+	    			_this.content = this.caseData.content
+	    			_this.reportTime = this.caseData.reportTime
+//	    			console.log(this.caseData.content)
+	    			
+	    			if(0 < _this.percent <= 33){
+	    				_this.colors = "exception"
+	    				
+	    			}else if(33 < _this.percent <= 66){
+	    				_this.colors = ""
+	    			}else{
+	    				_this.colors = "success"
+	    			}
+	    			
+	    			let caseTypeData = data['connuserCase']['caseType']
+	    			_this.typeName = caseTypeData.name
+	    			
+				},response => {
+					alert("获取数据失败1");
+				})
+			},
+			historyStatus: function(){           //获取历史状态
+				let _this = this    
+				this.$http.get(_this.historyStatusUrl + _this.item).then(response=>{          
+	    			let historyStatusData = response['body']['resultData']
+					_this.tableData = historyStatusData
+				},response => {
+					alert("获取数据失败");
+				})
+			},
+			
+			selectShow: function(){            
+				this.addBtnShow = false
+			},
+			toggle: function($event){           //展开按钮切换
+				if(this.isDown == true){
+					this.upAndDown = "收起"
+				}else{
+					this.upAndDown = "展开"
+				}
+				this.statusTableShow =! this.statusTableShow
+				this.isDown =! this.isDown
+			},
+			addStatus: function(){              //更改进展状态，点击确定按钮，向列表数据库中添加一条新的数据，刷新时不会消失。
+				let url = this.ctx + '/api/connuser/changeStatus.json';   //历史状态接口
+				this.$http.get(url + _this.item + "&statusName="+this.typeValue).then(response=>{          
+					this.historyStatus()    //执行该方法刷新数据，添加保存到数据库中
+					let rcode = response['body']['resultCode']    //接口数据中resultCode为0时，表示向数据库中添加数据成功
+					if(rcode==0){
+						this.$message({
+				          message: '改变状态成功！',
+				          type: 'success'
+				        });
+					}else{
+						this.$message.error('改变状态失败！');
+					}
+				},response => {
+					alert("获取数据失败");
+				})
+				
+				this.addBtnShow = true
+			},
+			cancelStatus: function(){           //更改进展状态 取消按钮
+				this.addBtnShow = true
+			},
+			textareaShowBtn: function(){        //修改项目说明
+				this.textareaShow = true
+			},
+			okEditText: function(){              //更改内容，保存到 改变内容 的数据库中
+				let url = this.ctx + '/api/connuser/editCaseContent';
+				this.$http.get(url + _this.item + "&content=" + this.textareaContent).then(response => {
+					let rcode = response['body']['resultCode']    //接口数据中resultCode为0时，向数据库中修改数据成功
+					this.changeStatus()
+				},response => {
+					alert("获取数据失败");
+				})
+				this.textareaContent = ""
+				this.textareaShow = false
+			},
+			cancelEditText: function(){
+				this.textareaContent = ""
+				this.textareaShow = false
+			},
+			itemTypeBtn: function($event){       //项目类型显示隐藏
+				this.itemTypeShow = true
+				this.thisBtn = false
+			},
+			changeCaseType: function(){         //获取已有类型
+				let _this = this    
+				this.$http.get(_this.caseTypeUrl + _this.item).then(response=>{          
+	    			let caseTypeData = response['body']['resultData']
+					_this.options1 = caseTypeData
+					
+				},response => {
+					alert("获取数据失败");
+				})
+			},
+			changeTypeBtnOk: function(){      //点击确定 改变类型
+                let url = this.ctx + '/api/connuser/changeType';
+				this.$http.get(url + _this.item + "&caseTypeId=" + this.typeValue1).then(response=>{          
+					this.changeStatus()
+					let rcode = response['body']['resultCode']
+				},response => {
+					alert("获取数据失败");
+				})
+				this.itemTypeShow = false
+				this.thisBtn = true
+			},
+			changeTypeBtnCancel: function(){
+				
+				this.itemTypeShow = false
+				this.thisBtn = true
+			},
+			getCaseUser: function(){     //获取参与人员
+				let _this = this    
+				this.$http.get(_this.caseUserUrl + _this.item).then(response=>{          
+	    			let caseUserData = response['body']['resultData']
+					_this.person = caseUserData
+				},response => {
+					alert("获取数据失败");
+				})
+			},
+            //上传附件
+		    handleRemove(file, fileList) {  //文件列表移除文件时的钩子
+		        console.log(file, fileList);
+		    },
+		    handlePreview(file) {    //点击已上传的文件链接时的钩子, 可以通过 file.response 拿到服务端返回数据
+		        console.log(file);  
+		    },
+		    //tab选项卡
+			handleClick(tab, event) {     
+		        console.log(tab, event);
+		    },
+
+		},
+		
+		//mounted钩子函数，要执行methods里面的等方法，先执行mounted函数
+		mounted: function(){     
+			this.$nextTick(function () {
+		        this.changeStatus();
+		        this.historyStatus();
+		        this.changeCaseType();
+		        this.getCaseUser();
+		        //this.getChatLists();
+		    })
+		}
+	}
+</script>
+
+<style scoped>
+	@import "../assets/css/banma.css";
+	
+	body{ font-size: 14px;}
+	button:focus {
+		outline: none;
+	}
+	.el-select {
+		margin-right: 10px;
+	}
+	.editTextarea {
+		margin-top: 20px;
+		margin-left: 50px;
+	}
+	.editTextarea .el-button {
+		margin-top: 14px;
+		margin-left: 14px;
+	}
+	.editName,
+	.editTime {
+		line-height: 42px;
+		margin-left: 8px;
+		margin-right: 8px;
+	}
+	ul.itemtype {
+		clear: both;
+		margin-top: 20px;
+	}
+	ul.itemtype li {
+		margin-bottom: 10px;
+	}
+	hr{
+		clear: both;
+		border: 0;
+		margin-top: 24px;
+		border-top:1px solid #ddd;
+	}
+	.personUl {
+		margin-top: 18px;
+	}
+	.personUl li {
+		float: left;
+		text-align: center;
+		margin-left: 10px;
+		margin-right: 10px;
+		margin-bottom: 20px;
+	}
+	.personUl li img {
+		display: block;
+	}
+	.personUl li span {
+		display: block;
+		font-size: 14px;
+		color: #40c199;
+	}
+	.attachment {
+		padding-bottom: 16px;
+		margin-top: 16px;
+	}
+	.attachment .el-button {
+		margin-top: -4px;
+	}
+	.comments .el-button {
+		margin-top: 14px;
+		margin-left: 14px;
+	}
+	.tab-title {
+		font-size: 16px !important;
+	}
+</style>
