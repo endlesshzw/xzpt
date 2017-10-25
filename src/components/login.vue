@@ -27,6 +27,7 @@
 	export default{
 		data(){
 			return{
+				test: 'test',
 				dialogVisible: false,
 				loginUrl: ctx + '/token/accessToken',
 				userName:'',
