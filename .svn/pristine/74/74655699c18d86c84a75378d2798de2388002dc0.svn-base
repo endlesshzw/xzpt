@@ -1,0 +1,150 @@
+<template>
+	<div id="timetable" class="rightfloat" style="margin-bottom: 32px;">
+    	<ul class="timeTable">
+    		<li>
+    				<span class="span1">创建时间</span><span> {{ showTimes.createdDate }} </span>
+    			
+    			
+    		</li>
+    		<li>
+    			
+    				<span class="span1">
+    					期望上线时间
+    				</span>
+	    			<span> 
+	    				{{ showTimes.expectedDate.slice(0,11) }}&nbsp;
+	    				<img @click="ifChangeExTimeFunc" style="cursor: pointer;" src="../assets/img/edit.png"/>
+	    			</span>
+    			
+	    			
+    		</li>
+    		<li v-if="ifChangeExTime">
+    			<el-date-picker id="tpick" @change="changeExTime" v-model="etime" type="date" placeholder="选择日期" :picker-options="pickerOptions0"></el-date-picker>
+    			<!--<div class="btns">
+    				<el-button @click="changeExTime" type="primary">确定</el-button>
+	    			<el-button @click="cancelChangeExTime" type="primary">取消</el-button>
+    			</div>-->
+    		</li>
+    		<li>
+    				<span class="span1">完成时间</span>
+	    			<span> {{ showTimes.finishDate }}&nbsp;</span>
+    			
+	    			
+    		</li>
+    		<li class="last-li">
+    				<span class="span1 last-span">耗时</span>
+	    			<span> 
+	    				<p>{{showTimes.consumeTimes[0]}}天{{showTimes.consumeTimes[1]}}小时{{showTimes.consumeTimes[2]}}分钟</p>
+		    			<div class="">
+		    				<el-progress
+		    					:text-inside="true" 
+		    					:stroke-width="18" 
+		    					:status="showColor(showTimes.percent)" 
+		    					:percentage="showTimes.percent">
+		    				</el-progress> 
+		    			</div>
+	    			</span>
+    			
+    		</li>
+    		<!--<li>
+    			<span class="span1">创建时间</span>
+    			<span class="span2">期望上线时间</span>
+    			<span class="span3">完成时间</span>
+    			<span class="span4">耗时</span>
+    		</li>
+    		<li>
+    			<span> {{ showTimes.createdDate }} </span>
+    			<span> {{ showTimes.expectedDate }}&nbsp;</span>
+    			<span> {{ showTimes.finishDate }}&nbsp;</span>
+    			<span> 
+    				<el-progress :text-inside="true" :stroke-width="18" :status="showColor(showTimes.percent)" :percentage="showTimes.percent"></el-progress> 
+    			</span>
+    		</li>-->
+    	</ul>
+    </div>
+</template>
+
+<script>
+	import { ctx } from '../global'
+	import Bus from '../bus.js'
+	export default {
+		data(){
+			return{
+				ifChangeExTime: 0,
+				etime: '',
+				pickerOptions0: { //日期
+					disabledDate(time) {
+						return time.getTime() < Date.now() - 8.64e7;
+					}
+				},
+				changeExTimeUrl: '/api/connuser/changeExpectDate'
+			}
+		},
+		name: 'timetable',
+		props: ['showTimes'],   //从父组件中接收数据的方法
+		mounted:function(){
+			
+		},
+		methods:{
+			showColor: function(percent){
+				if (percent>66) {
+		    		return 'exception'
+		    	}
+		    	if (percent<33) {
+		    		return 'success'
+		    	}else{
+		    		return ''
+		    	}
+			},
+			ifChangeExTimeFunc(){
+				if (this.ifChangeExTime == 0) {
+					this.ifChangeExTime = 1;
+				} else{
+					this.ifChangeExTime = 0;
+				}
+			},
+			changeExTime(date){
+				this.$http.post(ctx + this.changeExTimeUrl + "?caseId=" + this.$route.query.id + "&expectedDate=" + date)
+				.then(res => {
+					this.$message({
+						message: '修改期望上线时间成功！',
+						type: 'success'
+					});
+					this.showTimes.expectedDate = date;
+					Bus.$emit('getTarget', event.target);
+				})
+				this.ifChangeExTime = 0;
+			}
+//			cancelChangeExTime(){
+//				this.ifChangeExTime = 0;
+//			}
+		}
+	}
+</script>
+
+<style>
+	#timetable .btns{
+		width: 140px;
+		margin: 0 auto;
+	}
+	#tpick{
+		margin: 0 auto;
+		display: block;
+		width: 194px;
+	}
+	#timetable .last-span{
+		line-height: 70px;
+	}
+	#timetable .last-li{
+		height: 70px;
+	}
+	#timetable .el-progress-bar__outer{
+		background-color: #cccccc;
+	}
+	#timetable{
+		margin-right: 100px;
+		margin-top: 39px;
+		background-color: #eee;
+	}
+	@import "../assets/css/banma.css";
+</style>

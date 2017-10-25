@@ -1,0 +1,85 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+//import Home from '@/components/Home'
+import directory from '@/components/directory'
+import casetype from '@/components/casetype'
+import itemlist from '@/components/itemlist'
+import login from '@/components/login'
+import details from '@/components/details'
+//import wechat from '@/components/wechat'
+//import banmaTable from '@/components/banmaTable'
+import newcase from '@/components/newcase'
+import loginPage from '@/components/loginPage'
+//import addressBook1 from '@/components/addressBook1'
+
+Vue.use(Router)
+
+export default new Router({
+//	mode: 'history',
+  routes: [
+//  {
+//  	path: '/banmaTable',
+//  	name: 'BanmaTable',
+//  	component: banmaTable
+//  },
+    {
+    	path: '/loginPage',
+    	name: 'LoginPage',
+    	component: loginPage
+    },
+//  {
+//  	path: '/addressBook1',
+//  	name: 'addressBook1',
+//  	component: addressBook1
+//  },
+    {
+      path: '/',
+      redirect:'/login',
+    },
+//		{
+//    path: '/',
+//    redirect:'/loginPage',
+//  },
+    {
+      path: '/login',
+      name: 'Login',
+      component: login
+    },
+    {
+      path: '/directory',
+      name: 'Directory',
+      component: directory,
+      meta:{requireAuth: true}
+    },
+    {
+      path: '/casetype',
+      name: 'CaseType',
+      component: casetype,
+      meta:{requireAuth: true}
+    },
+    {
+      path: '/itemlist',
+      name: 'Itemlist',
+      component: itemlist,
+      meta:{requireAuth: true}
+    },
+    {
+      path: '/newcase',
+      name: 'Newcase',
+      component: newcase,
+      meta:{requireAuth: true}
+    },
+    {
+      path: '/details',
+      name: 'Details',
+      component: details,
+      meta:{requireAuth: true}
+    }
+//  {
+//    path: '/wechat',
+//    name: 'Wechat',
+//    component: wechat
+//  },
+    
+  ],
+})

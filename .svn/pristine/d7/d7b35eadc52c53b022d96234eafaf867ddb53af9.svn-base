@@ -1,0 +1,730 @@
+<template>
+	<div id="deTails">
+		<div class="topTitle" style="text-align: center;">
+			<span class="text">{{ guiShuXiangMu }}</span>
+			<el-button size="small" @click="backToList" style="margin: 4px 10px;float: left;">返回</el-button>
+	    </div>
+	    <div style="width: 1200px; margin: 0 auto;">
+		    
+		    
+		    <div style="clear: both; border-bottom: 1px solid #ddd; margin: 16px 0; padding: 16px 0;">
+		    	<div class="editItems">
+		    		<img class="leftfloat touxiang" :src="reportHeadImg" :onerror="defaultImg">
+		    		<span class="leftfloat editName"> {{reportUserName}} </span>
+		    		<span class="leftfloat editTime"> {{ reportTime }} </span>
+		    		<!--<el-button 
+		    			class="addProgress" 
+		    			type="primary" 
+		    			icon="edit" 
+		    			@click="textareaShowBtn"
+		    			style="margin-top: 12px;">	
+		    		</el-button>-->
+		    		<img @click="textareaShowBtn" class="edit" style="float: right;cursor: pointer;margin: 10px 5px;" src="../assets/img/edit.png"/>
+		    		<div style="margin-top: 8px;margin-left: 50px;padding-top: 50px;"> 
+		    			<span style="color: rgb(64, 193, 154);">内容描述：</span>
+		    			{{ content }} 
+		    		</div>
+		    		<div v-show="textareaShow" class="editTextarea">
+		    			<el-input type="textarea" :rows="4" v-model="textareaContent" ></el-input>
+		    			<el-button class="rightfloat" :plain="true" type="primary" @click="okEditText">&nbsp;确定&nbsp;</el-button>
+			    	    <el-button class="rightfloat" :plain="true" type="primary" @click="cancelEditText">&nbsp;取消&nbsp;</el-button>
+		    		</div>
+		    		
+		    		<ul class="itemtype">
+		    			<li>
+		    				<span style="color: #40c19a;">类型：</span>
+		    				<span> {{ typeName }} </span>
+		    				<img style="cursor: pointer; margin: -2px 10px;" @click="itemTypeBtn" v-show="thisBtn" src="../assets/img/edit.png"/>
+		    				<!--<el-button v-show="thisBtn" class="addProgress" type="primary" icon="edit" @click="itemTypeBtn"></el-button>-->
+		    				<div v-show="itemTypeShow" style="display: inline-block;">
+								<el-select v-model="typeValue1" placeholder="请选择类型">
+								    <el-option
+								      v-for="item in options1"
+								      :key="item.id"
+								      :label="item.name"
+								      :value="item.id">
+								    </el-option>
+						    	</el-select>
+						    	<el-button :plain="true" type="primary" @click="changeTypeBtnOk">&nbsp;确定&nbsp;</el-button>
+						    	<el-button :plain="true" type="primary" @click="changeTypeBtnCancel">&nbsp;取消&nbsp;</el-button>
+							</div>
+		    			</li>
+		    			<li>
+		    				<span style="color: #40c19a;">优先级：&nbsp; </span>
+		    				<span> {{ youXianJi }} </span>
+		    				<img style="cursor: pointer; margin: -2px 10px;" @click="itemYxjBtn" v-show="thisYxjBtn" src="../assets/img/edit.png"/>
+		    				<!--<el-button v-show="thisYxjBtn" class="addProgress" type="primary" icon="edit" @click="itemYxjBtn"></el-button>-->
+		    				<div v-show="itemYxjShow" style="display: inline-block;">
+								<el-select v-model="priorityId" placeholder="请选择优先级">
+								    <el-option
+								      v-for="item in priority"
+								      :key="item.id"
+								      :label="item.name"
+								      :value="item.id">
+								    </el-option>
+						    	</el-select>
+						    	<el-button :plain="true" type="primary" @click="changePriorityBtnOk">&nbsp;确定&nbsp;</el-button>
+						    	<el-button :plain="true" type="primary" @click="changePriorityBtnCancel">&nbsp;取消&nbsp;</el-button>
+							</div>
+		    			</li>
+		    			<li><span style="color: #40c19a;">归属项目：&nbsp; </span>{{ guiShuXiangMu }} </li>
+		    		</ul>
+		    	</div>
+		    </div>
+		    <div class="leftfloat" style="margin-top: 0px; margin-bottom: 32px;">
+		    	<span style="color: #40c19a;font-weight: 600;">进展状态</span>
+		    	<img style="cursor: pointer; margin: -2px 10px;" @click="selectShow" v-if="addBtnShow" src="../assets/img/edit.png"/>
+				<!--<el-button v-if="addBtnShow" class="addProgress" type="primary" icon="edit" @click="selectShow"></el-button>-->
+				<div v-else style="display: inline-block;">
+					<el-select v-model="typeValue" placeholder="请选择状态">
+					    <el-option
+					      v-for="item in options"
+					      :key="item.id"
+					      :label="item.name"
+					      :value="item.name">
+					    </el-option>
+			    	</el-select>
+			    	<el-button :plain="true" type="primary" @click="addStatus">&nbsp;确定&nbsp;</el-button>
+			    	<el-button :plain="true" type="primary" @click="cancelStatus" style="margin-right: 10px;">&nbsp;取消&nbsp;</el-button>
+				</div>
+				<el-button class="unfoldBtn" type="primary" @click="toggle($event)" style="padding: 3px 4px;">
+		    		<i class="el-icon-arrow-down" v-bind:class="{'el-icon-arrow-down': isDown, 'el-icon-arrow-up': !isDown }"></i>
+		    		&nbsp;{{ upAndDown }}&nbsp;
+		    	</el-button>
+		    	<el-table v-show="statusTableShow" :data="tableData" style="width: 700px; margin-top: 16px;margin-left: 50px;">
+			        <el-table-column prop="name" label="状态"></el-table-column>
+			        <el-table-column prop="opt_date" label="时间"></el-table-column>
+			    </el-table>
+		    </div>
+		    <timeTable v-bind:show-times="caseData"></timeTable>
+		    <hr>
+		    <div style="padding-top: 16px;">
+		    	<span style="color: #40c19a;">参与的人</span>
+		    	<el-button class="addProgress" type="primary" @click="addressVisible = true">
+		    		<i class="el-icon-plus"></i>
+		    	</el-button>
+		    	<div style="display: inline-block;">&nbsp;
+		    		<el-button v-if="applyId()" type="" @click="cancelApply" style="background-color: #eee;color:#333;border:0;padding: 4px 8px;">取消参与</el-button>
+		    		<el-button v-else type=""  @click="apply" style="background-color: #218ee9;color:#fff;border:0;padding: 4px 8px;">我要参与</el-button>
+		    	</div>
+		    	<ul class="personUl">
+		    		<li v-for="item in person">
+		    			<img :src="item.headImg" 
+		    				 :onerror="defaultImg"
+		    				 style="display: block; 
+		    				 width: 46px; 
+		    				 height: 46px; 
+		    				 border-radius: 50%;"> 
+		    			<span> {{ item.userName }} </span>
+		    		</li>
+		    	</ul>
+		    </div>
+		    <hr>
+		    <div class="attachment">
+		    	<span class="leftfloat" style="margin-right: 10px;">附件</span>
+		    	<el-upload
+		    	  list-type="picture" 
+		    	  :before-upload="beforeAvatarUpload"
+				  :action="uploadUrl"
+				  :on-success="onSuccess"
+				  :on-preview="handlePreview"
+				  :on-remove="handleRemove"
+				  :file-list="fileList">
+				  <el-button size="small" type="primary">点击上传</el-button>
+				  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+				</el-upload>
+				<el-dialog v-model="dialogVisible" size="tiny">
+				  <img width="100%" :src="dialogImageUrl" alt="">
+				</el-dialog>
+		    </div>
+		    <hr>
+		    <div class="comments">
+		    	<el-tabs v-model="activeName" @tab-click="handleClick">
+				    <el-tab-pane :class="tab-title" label="讨论" name="first">
+				    	<!--引用子组件，将三个值传给子组件-->
+				    	<commentList></commentList>
+				    </el-tab-pane>
+				    <el-tab-pane class="tab-title" label="工作记录" name="second">
+				    	<workLogList ref="workLogList"></workLogList>
+				    </el-tab-pane>
+				    <el-tab-pane class="tab-title" label="其他2" name="third">其他2</el-tab-pane>
+				</el-tabs>
+		    </div>
+	    </div>
+	    <el-dialog
+	      @close="onClose"
+	      title="选择参与的人"
+	      :visible.sync="addressVisible"
+	       >
+    		<el-transfer
+    			:button-texts="['取消', '邀请']"
+    			ref="transfer"
+    			id="address"
+    			style="margin: 0 10%;"
+			  	:props="{key:'id',label:'name'}"
+			  	:footer-format="{
+			      noChecked: '${total}',
+			      hasChecked: '${checked}/${total}'
+			      }" :titles="['全部', '邀请的人']" class="trans" filterable v-model="showLabel" :data="address">
+			</el-transfer>
+			<el-button id="comfirmTransfer" type="primary" @click="submitNames" :loading="clicktag">确定</el-button>
+	    </el-dialog>
+	</div>
+</template>
+
+<script>
+	import timeTable from './timeTable'
+	import commentList from './commentList'
+	import workLogList from './workLogList'
+	import {ctx} from '../global'
+	
+	export default {
+		name: 'deTails',
+		components: {
+			timeTable,
+			commentList,
+			workLogList
+		},
+		computed: {
+			uploadUrl: function(){
+				return "http://long.xiaoqunei.cn/eleUpload?token=" + this.fileToken + "&client=html5&name=" + this.fileName + "&size=" + this.fileSize;
+			}
+		},
+		data: function(){
+			return {  
+				dialogImageUrl: '',
+        		dialogVisible: false,
+				getUserIdUrL: "/api/connuser/getUserId",
+				saveUsersUrl: "/api/connuser/saveCaseUser2",
+				address:[],
+				showLabel:[],
+				addressVisible: false,
+    			item: '?caseId=' + this.$route.query.id,   //配单id
+    			logUserId: sessionStorage.getItem("userId"),             //假设登录的用户是小乔的id
+
+				changeStatusUrl: ctx + '/api/connuser/getCaseDetail.json',      //改变进展状态select中的数据接口
+				historyStatusUrl: ctx + '/api/connuser/getStatusLogByCaseId.json', //进展状态 历史数据接口 
+				caseTypeUrl: ctx + '/api/connuser/getCaseTypes',             //获取类型
+				caseUserUrl: ctx + '/api/connuser/getCaseUsers',             //获取参与人员
+				chatListUrl: ctx + '/api/connuser/getChatLists',             //获取评论
+				casePriorityUrl: ctx + '/api/connuser/getPriority',          //获取优先级
+				sn: '',
+				addBtnShow: true,
+				options: [],
+		        typeValue: '',
+		        tableData: [],
+		        upAndDown: '收起',
+		        statusTableShow: true,
+		        isDown: false,
+		        caseData: '',
+		        reportHeadImg: '',
+		        reportUserName: '',
+		        reportTime: '',
+		        content: '',
+		        textareaShow: false,
+		        textareaContent: '',
+		        thisBtn: true,
+		        thisYxjBtn: true,
+		        options1: [],
+		        typeName: '',
+		        typeValue1: '',
+		        priority: [],
+		        priorityId: '',
+		        itemTypeShow: false,
+		        itemYxjShow: false,
+		        youXianJi: '',
+		        guiShuXiangMu: '',
+		        fuZeRen: '',
+		        person: [],
+		        activeName: 'first',
+				show:false,
+				oldUsers: [],
+				fileList: [],
+				clicktag: 0,
+				participateUser:[],
+				fileName: "",
+				fileSize: "",
+				fileToken: "",
+				defaultImg: 'this.src="' + require('../assets/img/noPic.png') + '"',
+			}
+		},
+		methods: { 
+			onSuccess(response, file, fileList){ //二次保存
+//				console.log(response,file,fileList)
+				this.$http.post(ctx + "/api/connuser/saveAtt?token=" + response.token +"&projectId=" + this.$route.query.id)
+				.then(res=>{
+//					console.log(res)
+				}, res=>{
+					
+				})
+			},
+			randomString() {  
+			　　var len = 6;  
+			　　var $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';  
+			　　var maxPos = $chars.length;  
+			　　var pwd = '';  
+			　　for (var i = 0; i < len; i++) {  
+			　　　　pwd += $chars.charAt(Math.floor(Math.random() * (maxPos+1)));  
+			　　}
+			　　return pwd;  
+			},
+			beforeAvatarUpload(file){ 
+//				this.$http.post( "http://long.xiaoqunei.cn/tk?name=" + file.name + "&size=" + file.size)
+//				.then(res=>{
+//					console.log(res)
+//				})
+				let token = this.randomString()
+				this.fileName = file.name;
+				this.fileSize = file.size;
+				this.fileToken = token;
+			},
+			backToList(){
+				this.$router.go(-1)
+			},
+			getUserId(){//获取参与人
+				this.$http.post(ctx + this.getUserIdUrL + this.item)
+				.then(res=>{
+					this.participateUser = res['body']['resultData']
+					this.showLabel = []
+					for(let i =0; i<this.participateUser.length;i++){
+						this.showLabel.push(this.participateUser[i].id)
+					}
+					this.oldUsers = this.participateUser
+				},res=>{
+					
+				})
+			},
+			getListAtt(){ //获取附件列表
+				this.$http.post(ctx +"/api/connuser/listAtt?projectId=" + this.$route.query.id )
+				.then(res=>{
+//					alert(res)
+					let arr =[];
+					console.log(res);
+					let datas = res['body']['data'];
+					for(let i = 0; i<datas.length;i++){
+						let obj = {
+							name :datas[i].filename,
+							url : "http://long.xiaoqunei.cn" + datas[i].filepath,
+							token : datas[i].token,
+							projectid : datas[i].projectid,
+							module: datas[i].module
+						}
+						arr.push(obj)
+					}
+					this.fileList = arr
+					console.log(arr)
+				}, res=>{
+					
+				})
+			},
+			submitNames(){//提交参与人
+				if (this.clicktag == 0) {
+					this.clicktag = 1;
+					let oldPeople = []
+					let newPeople = []
+					for(let i = 0; i < this.oldUsers.length; i++){
+						oldPeople.push(this.oldUsers[i].id)
+					}
+					for(let i = 0; i < this.$refs.transfer.targetData.length; i++){
+						newPeople.push(this.$refs.transfer.targetData[i].id)
+					}
+					let obj = {
+						"caseId": this.$route.query.id,
+						"people": oldPeople,
+						"newpeoples": newPeople
+					}
+					this.$http.post(ctx + this.saveUsersUrl, obj)
+					.then(res=>{
+						this.addressVisible = false
+						this.getUserId()//更新参与人
+						this.getCaseUser()//更新参与人头像
+						this.$message({
+				          message: '保存成功',
+				          type: 'success'
+				        });
+				       this.clicktag = 0
+				       this.$refs.workLogList.getCaseLogLists();
+					}, res=>{
+						this.$message({
+				          message: '保存失败',
+				          type: 'warning'
+				       	});
+					})
+				} else{
+					
+				}
+//				setTimeout(function () { this.clicktag = 0 }, 2000);
+			},
+			onClose(){
+				
+			},
+			getAllUsers(){//地址本获取用户
+		  	  	this.$http.post( ctx + "/api/connuser/getUsers")
+		  	  	.then(res=>{
+		  	  		let data = res['body']['resultData']
+		  	  		this.address = data
+		  	  	},res=>{
+//		  	  		alert("获取用户失败")
+		  	  	})
+		  	  },
+			changeStatus: function(){              //获取基本详情信息数据
+				let _this = this                   //把当前vue对象赋值给变量 _this
+				this.$http.get(_this.changeStatusUrl + _this.item).then(response=>{          
+	    			let data = response['body']['resultData']
+	    			console.log(data)
+	    			let typeData = data['caseStatus']
+	    			_this.options = typeData
+	    			
+	    			this.caseData = data['connuserCase']['connuserCase']
+	    			_this.sn = this.caseData.sn
+	    			_this.reportHeadImg = ctx + this.caseData.reportHeadImg
+	    			console.log(this.caseData)
+	    			_this.reportUserName = this.caseData.reportUserName
+	    			_this.content = this.caseData.content
+	    			_this.reportTime = this.caseData.reportTime
+	    			
+	    			//alert(this.caseData.percent)
+
+	    			let caseTypeData = data['connuserCase']['caseType']
+	    			_this.typeName = caseTypeData.name
+	    			
+	    			if(data['connuserProjectUser'] != "" && data['connuserProjectUser'] != null){
+	    				this.fuZeRen = data['connuserProjectUser'].userName
+	    			}
+	    			
+	    			if(data['connuserCase']['connuserProject'] != "" && data['connuserCase']['connuserProject'] != null){
+	    				this.guiShuXiangMu = data['connuserCase']['connuserProject'].name
+	    			}
+	    			
+	    			if( this.caseData.priority == 4){
+	    				this.youXianJi = '低'
+	    			}else if( this.caseData.priority == 3){
+	    				this.youXianJi = '中'
+	    			}else if( this.caseData.priority == 2){
+	    				this.youXianJi = '高'
+	    			}else{
+	    				this.youXianJi = '重要'
+	    			}
+	    			
+				},response => {
+//					alert("获取数据失败");
+				})
+			},
+			historyStatus: function(){           //获取历史状态
+				let _this = this    
+				this.$http.get(_this.historyStatusUrl + _this.item).then(response=>{          
+	    			let historyStatusData = response['body']['resultData']
+					_this.tableData = historyStatusData
+				},response => {
+//					alert("获取数据失败");
+				})
+			},
+			
+			selectShow: function(){            
+				this.addBtnShow = false
+			},
+			toggle: function($event){           //展开按钮切换
+				if(this.isDown == true){
+					this.upAndDown = "收起"
+				}else{
+					this.upAndDown = "展开"
+				}
+				this.statusTableShow =! this.statusTableShow
+				this.isDown =! this.isDown
+			},
+			addStatus: function(){              //更改进展状态，点击确定按钮，向列表数据库中添加一条新的数据，刷新时不会消失。
+				let url = ctx + '/api/connuser/changeStatus.json';   //历史状态接口
+				this.$http.get(url + this.item + "&statusName="+this.typeValue).then(response=>{
+					this.changeStatus();
+					this.historyStatus()    //执行该方法刷新数据，添加保存到数据库中
+					let rcode = response['body']['resultCode']    //接口数据中resultCode为0时，表示向数据库中添加数据成功
+					if(rcode==0){
+						this.$message({
+				          message: '改变状态成功！',
+				          type: 'success'
+				        });
+					}else{
+						this.$message.error('改变状态失败！');
+					}
+					this.$refs.workLogList.getCaseLogLists();
+				},response => {
+//					alert("获取数据失败");
+				})
+				
+				this.addBtnShow = true
+			},
+			cancelStatus: function(){           //更改进展状态 取消按钮
+				this.addBtnShow = true
+			},
+			textareaShowBtn: function(){        //修改项目说明
+				this.textareaShow = true
+			},
+			okEditText: function(){              //更改内容，保存到 改变内容 的数据库中
+				let url = ctx + '/api/connuser/editCaseContent';
+				if(this.textareaContent != ""){
+					this.$http.get(url + this.item + "&content=" + this.textareaContent).then(response => {
+						let rcode = response['body']['resultCode']    //接口数据中resultCode为0时，向数据库中修改数据成功
+						this.changeStatus()
+						this.$refs.workLogList.getCaseLogLists();
+					},response => {
+//						alert("获取数据失败");
+					})
+					
+					this.textareaContent = ""
+					this.textareaShow = false
+
+				}else{
+					this.$alert('修改内容不能为空', '班MA提示', {
+			          confirmButtonText: '确定',
+			        });
+				}
+			},
+			cancelEditText: function(){
+				this.textareaContent = ""
+				this.textareaShow = false
+			},
+			itemTypeBtn: function($event){       //项目类型显示隐藏
+				this.itemTypeShow = true
+				this.thisBtn = false
+			},
+			changeCaseType: function(){         //获取已有类型
+				let _this = this    
+				this.$http.get(_this.caseTypeUrl + _this.item).then(response=>{          
+	    			let caseTypeData = response['body']['resultData']
+					_this.options1 = caseTypeData
+					
+				},response => {
+//					alert("获取数据失败");
+				})
+			},
+			changeTypeBtnOk: function(){      //点击确定 改变类型
+                let url = ctx + '/api/connuser/changeType';
+				this.$http.get(url + this.item + "&caseTypeId=" + this.typeValue1).then(response=>{          
+					this.changeStatus()
+					this.$refs.workLogList.getCaseLogLists();
+				},response => {
+//					alert("获取数据失败");
+				})
+				this.itemTypeShow = false
+				this.thisBtn = true
+			},
+			changeTypeBtnCancel: function(){
+				this.itemTypeShow = false
+				this.thisBtn = true
+			},
+			itemYxjBtn: function($event){       //优先级显示隐藏
+				this.itemYxjShow = true
+				this.thisYxjBtn = false
+			},
+			changeCasePriority: function(){         //获取优先级
+				let _this = this    
+				this.$http.get(_this.casePriorityUrl + _this.item).then(response=>{          
+	    			let casePriorityData = response['body']['resultData']
+					_this.priority = casePriorityData
+					
+				},response => {
+					alert("获取数据失败");
+				})
+			},
+			changePriorityBtnOk: function(){     //改变优先级
+                let url = ctx + '/api/connuser/editPriority';
+				this.$http.get(url + this.item + "&priorityId=" + this.priorityId).then(response=>{          
+					this.changeStatus()
+					this.$refs.workLogList.getCaseLogLists();
+				},response => {
+					alert("获取数据失败");
+				})
+				this.itemYxjShow = false
+				this.thisYxjBtn = true
+			},
+			changePriorityBtnCancel: function(){
+				this.itemYxjShow = false
+				this.thisYxjBtn = true
+			},
+			getCaseUser: function(){     //获取参与人员
+				this.$http.get(this.caseUserUrl + this.item).then(response=>{          
+	    			let caseUserData = response['body']['resultData']
+					this.person = caseUserData
+					
+					for( let i in caseUserData){ 
+						caseUserData[i].headImg = ctx + caseUserData[i].headImg
+					}
+				},response => {
+					alert("获取数据失败");
+				})
+			},
+			applyId: function(){
+				var applyid = this.person.map(each => each.userId)
+				for(let i in applyid){
+					if(applyid[i] == this.logUserId){
+						return true
+					}
+				}
+			},
+			apply: function(){            //我要参与
+				let url = ctx + '/api/connuser/apply'
+				this.$http.get(url + this.item).then(response=>{
+					this.getCaseUser()
+					this.$refs.workLogList.getCaseLogLists();
+				},response=>{
+					alert("获取数据失败");
+				})
+			},
+			cancelApply: function(){        //取消参与
+				let url = ctx + '/api/connuser/cancelApply'
+				this.$http.get(url + this.item).then(response=>{
+					this.getCaseUser()
+					this.$refs.workLogList.getCaseLogLists();
+				},response=>{
+					alert("获取数据失败");
+				})
+			},
+            //上传附件
+		    handleRemove(file, fileList) {  //文件列表移除文件时的钩子
+		        this.$http.post( ctx + "/api/connuser/deleteAtt?module=" + file.module + "&token=" +file.token +"&projectId=" + file.projectid)
+		        .then(res=>{
+//		        	console.log(res)
+		        }, res=>{
+		        	
+		        })
+		    },
+		    handlePreview(file) {    //点击已上传的文件链接时的钩子, 可以通过 file.response 拿到服务端返回数据
+		        console.log(file); 
+		        this.dialogImageUrl = file.url;
+       			this.dialogVisible = true;
+		    },
+		    //tab选项卡
+			handleClick(tab, event) {     
+		        console.log(tab, event);
+		    },
+
+		},
+		
+		//mounted钩子函数，要执行methods里面的等方法，先执行mounted函数
+		mounted: function(){   
+			
+		},
+		activated(){
+			this.getListAtt()
+			this.item = '?caseId=' + this.$route.query.id
+	        this.changeStatus()
+	        this.historyStatus()
+	        this.changeCaseType()
+	        this.getCaseUser()
+	        this.getAllUsers()
+	        this.getUserId()
+	        this.changeCasePriority()
+		}
+	}
+</script>
+<style>
+	
+	.editItems{
+		margin-top: 20px;
+	}
+	#comfirmTransfer{
+		display: block;
+		margin: 20px auto 0;
+	}
+	#address .el-transfer-panel{
+		width: 40%!important;
+	}
+	#address .el-transfer-panel__body{
+		height: 300px;
+	}
+	#address .el-checkbox-group{
+		height: 100%;
+	}
+	#address .el-dialog__body{
+		padding: 30px 0px;
+	}
+	#deTails .el-tabs__item{
+		font-size: 16px;
+	}
+</style>
+<style scoped>
+	@import "../assets/css/banma.css";
+	
+	body{ font-size: 14px;}
+	button:focus {
+		outline: none;
+	}
+	.el-select {
+		margin-right: 10px;
+	}
+	.editTextarea {
+		margin-top: 20px;
+		margin-left: 50px;
+	}
+	.editTextarea .el-button {
+		margin-top: 14px;
+		margin-left: 14px;
+	}
+	.editName,
+	.editTime {
+		line-height: 42px;
+		margin-left: 8px;
+		margin-right: 8px;
+	}
+	.el-transfer{
+		font-size: 16px !important;
+	}
+	
+	ul.itemtype {
+		margin-left: 50px;
+		clear: both;
+		margin-top: 20px;
+	}
+	ul.itemtype li {
+		margin: 20px 0;
+	}
+	.el-dialog__body{
+		padding: 30px 120px;
+	}
+	hr{
+		clear: both;
+		border: 0;
+		margin-top: 24px;
+		border-top:1px solid #ddd;
+	}
+	.personUl {
+		margin-top: 18px;
+	}
+	.personUl li {
+		float: left;
+		text-align: center;
+		margin-left: 10px;
+		margin-right: 10px;
+		margin-bottom: 20px;
+	}
+	.personUl li img {
+		display: block;
+	}
+	.personUl li span {
+		display: block;
+		font-size: 14px;
+		color: #40c199;
+	}
+	.attachment {
+		padding-bottom: 16px;
+		margin-top: 16px;
+	}
+	.attachment .el-button {
+		margin-top: -4px;
+	}
+	.comments .el-button {
+		margin-top: 14px;
+		margin-left: 14px;
+	}
+	.tab-title {
+		font-size: 16px !important;
+	}
+	.el-button.addProgress.el-button--primary {
+		padding-bottom: 2px;
+	    padding-top: 2px;
+	    padding-left: 2px;
+	    padding-right: 2px;
+	    width: 24px;
+	    height: 22px;
+	}
+</style>

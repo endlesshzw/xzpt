@@ -1,0 +1,61 @@
+<template>
+	<div class="wrap">
+		<i class="el-icon-loading"></i>
+		<p style="margin-top: 10px;">正在跳转...</p>
+	</div>
+</template>
+
+<script>
+	import {ctx} from '../global'
+	export default{
+		data(){
+			return{
+				
+			}
+		},
+		mounted:function(){
+			document.title = "协作平台"
+			console.log(this.$route);
+			//let token = this.$route.query.ticket;
+			//let token=this.$utils.getUrlKey("ticket")
+			let token=this.$utils.getUrlKey("u");
+			console.log(token);
+			//let token = 'jt3Ln1A88PcPtn4afgAfzum0WJcOnX3LHI9elY6SeeQo1aD6Mi8vNh3BFiSu1W1MdZxpyRu52DOk3ppCO/SSA32vkduqfkd4Y4KT9y0yUko=';
+			/*window.sessionStorage.setItem("ticket", token)*/
+			this.$http.post(ctx+"/token/getUserInfoByToken", token).then(res=>{  
+					let resultData = res['body'];
+					//let userId = resultData.userId;
+					//let userName = resultData.userName;
+					let userId = resultData.data.userId;
+					let userName = resultData.data.userName;
+					let ticket = resultData.data.ticket;
+					window.sessionStorage.setItem("userName", userName);
+					window.sessionStorage.setItem("userId", userId);
+					window.sessionStorage.setItem("ticket", ticket);
+					/*window.sessionStorage.setItem("userName", userName)
+					window.sessionStorage.setItem("userId", userId)*/
+			this.$router.push({path: '/itemlist'})
+	    		},res => {
+						this.$message({
+				          message: '登录超时',
+				          type: 'warning'
+				        });
+	    		})
+			
+			
+			
+		},
+		
+	}
+</script>
+
+<style scoped>
+	i{
+		font-size: 30px;
+		text-align: center;
+	}
+	.wrap{
+		padding-top: 200px;
+		text-align: center;
+	}
+</style>

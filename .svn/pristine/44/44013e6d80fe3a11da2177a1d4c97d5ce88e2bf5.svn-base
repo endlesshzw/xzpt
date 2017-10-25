@@ -1,0 +1,84 @@
+<template>
+	<div id="timetable" class="rightfloat" style="margin-bottom: 32px;">
+    	<ul class="timeTable">
+    		<li>
+    				<span class="span1">创建时间</span><span> {{ showTimes.createdDate }} </span>
+    			
+    			
+    		</li>
+    		<li>
+    			
+    				<span class="span1">期望上线时间</span>
+	    			<span> {{ showTimes.expectedDate }}&nbsp;</span>
+    			
+	    			
+    		</li>
+    		<li>
+    				<span class="span1">完成时间</span>
+	    			<span> {{ showTimes.finishDate }}&nbsp;</span>
+    			
+	    			
+    		</li>
+    		<li>
+    				<span class="span1">耗时</span>
+	    			<span> 
+	    				<el-progress :text-inside="true" :stroke-width="18" :status="showColor(showTimes.percent)" :percentage="showTimes.percent"></el-progress> 
+	    			</span>
+    			
+    		</li>
+    		<!--<li>
+    			<span class="span1">创建时间</span>
+    			<span class="span2">期望上线时间</span>
+    			<span class="span3">完成时间</span>
+    			<span class="span4">耗时</span>
+    		</li>
+    		<li>
+    			<span> {{ showTimes.createdDate }} </span>
+    			<span> {{ showTimes.expectedDate }}&nbsp;</span>
+    			<span> {{ showTimes.finishDate }}&nbsp;</span>
+    			<span> 
+    				<el-progress :text-inside="true" :stroke-width="18" :status="showColor(showTimes.percent)" :percentage="showTimes.percent"></el-progress> 
+    			</span>
+    		</li>-->
+    	</ul>
+    </div>
+</template>
+
+<script>
+	export default {
+		name: 'timetable',
+		mounted:function(){
+//			if(this.showTimes.expectedDate == null){
+//				this.showTimes.expectedDate = "无"
+//			}
+//			if(this.showTimes.finishDate == null){
+//				this.showTimes.finishDate = "无"
+//			}
+		},
+		props: ['showTimes'],   //从父组件中接收数据的方法
+		methods:{
+			showColor: function(percent){
+				if (percent>66) {
+		    		return 'exception'
+		    	}
+		    	if (percent<33) {
+		    		return 'success'
+		    	}else{
+		    		return ''
+		    	}
+			}
+		}
+	}
+</script>
+
+<style>
+	#timetable .el-progress-bar__outer{
+		background-color: #cccccc;
+	}
+	#timetable{
+		margin-right: 100px;
+		margin-top: 39px;
+		background-color: #eee;
+	}
+	@import "../assets/css/banma.css";
+</style>

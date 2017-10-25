@@ -1,0 +1,420 @@
+
+
+<template v-loading.body="loading">
+	<div class="dir" id="dir" style="padding: 30px;"  >
+		<h2 style="vertical-align: middle;text-align: center;border-bottom: 2px solid red;padding: 30px;">{{typeName}}</h2>
+		<el-form ref="form" label-width="80px" style="padding: 30px;" >
+			<template  v-for="field of fields">
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：标题域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='title'" >
+						<XJJInput :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJInput>
+						<!--<el-input v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" :placeholder="'请输入'+field.name"   ></el-input>-->
+				</el-form-item>
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：文本域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='text'">
+					<XJJInput :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJInput>
+						<!--<el-input v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" :placeholder="'请输入'+field.name"></el-input>-->
+				</el-form-item>
+				
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：文本域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='chatContent'">
+						<XJJInput :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" type="textarea" rows="15"></XJJInput>
+						<!--<el-input v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" :placeholder="'请输入'+field.name"></el-input>-->
+				</el-form-item>
+				
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：内容域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='content'">
+						<XJJTextarea :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue"  ></XJJTextarea>
+						<!--
+						<el-input 
+						 v-bind:value="getWId('this.form.'+field.widgetId)" 
+						  @input="updateValue('this.form.'+field.widgetId,$event)"
+						  type="textarea"
+						  :rows="15"
+						  :placeholder="'请输入'+field.name">
+						</el-input>
+						-->
+				</el-form-item>
+				
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：选择框
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='select'">
+							<XJJSelect :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJSelect>
+							<!--
+								<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in getOption(field.defaultValue)"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						  -->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：选择框
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='status'">
+						<XJJStatus :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJStatus>
+						  <!--<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in statuss"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						   -->
+			    </el-form-item>
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：选择框
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='caseType'">
+						
+						<XJJCaseType :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJCaseType>
+						<!--
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in caseTypes"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						  -->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：有限级列表
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='priority'">
+						
+						<XJJPriority :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJPriority>
+						 <!--<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)"  filterable :placeholder="'请选择'+field.name" >
+						    <el-option v-for="item in prioritys"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						  -->
+			    </el-form-item>
+			    
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：项目列表
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='projectId'">
+						<XJJProject :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJProject>
+						<!--<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable  :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in projects"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>-->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：模块列表
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='moduleId'">
+						<XJJModel :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJModel>
+						<!--<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)"  filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in modules"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select> -->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：报告日期
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='reportTime'">
+						<XJJDatetime :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJDatetime>
+						
+						 <!--<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="datetime"
+						      	format="yyyy-MM-dd HH:mm"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker> -->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：日期
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='date'">
+						
+						<XJJDate :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJDate>
+						   <!--<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="date"
+						      	format="yyyy-MM-dd"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>-->
+			    </el-form-item>
+			    
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：日期+时间
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='dateTime'">
+						<XJJDatetime :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJDatetime>
+						
+						  <!--<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="datetime"
+						      	format="yyyy-MM-dd HH:mm"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>-->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：时间
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='time'">
+			    	<XJJHours :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue"></XJJHours>
+			    	
+			    	<!--<el-time-picker
+				   		v-bind:value="getWId('this.form.'+field.widgetId)"  
+						@input="updateDateValue('this.form.'+field.widgetId,$event)"
+					format="HH:mm"
+				    :placeholder="'选择'+field.name">
+				  </el-time-picker>-->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：预期日期
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='expectedDate'">
+						<XJJDate :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJDate>
+						<!--<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="date"
+						      	format="yyyy-MM-dd"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>-->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-12
+                	描述：地址本
+                -->
+                <el-form-item :label="field.name" v-if="field.dataType=='addr'">
+						<XJJAddr :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJAddr>
+						 <!--<el-select  v-bind:value="getWId('this.form.'+field.widgetId)" style="width: 100%;" @input="updateAddrValue('this.form.'+field.widgetId,$event)"  filterable multiple :placeholder="'请选择'+field.name" >
+						    <el-option v-for="item in users"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						 -->
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-12
+                	描述：
+                -->
+                <el-form-item :label="field.name" v-if="field.dataType=='invitation'">
+						<XJJAddr :field="field" :wid="'this.form.'+field.widgetId" @setValue="setValue" ></XJJAddr>
+						<!--<el-select  v-bind:value="getWId('this.form.'+field.widgetId)" style="width: 100%;" @input="updateAddrValue('this.form.'+field.widgetId,$event)"  filterable multiple :placeholder="'请选择'+field.name" >
+						    <el-option v-for="item in users"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>  -->
+						
+			    </el-form-item>
+			    
+			     
+			 
+			</template>
+			<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-12
+                	描述：附件
+                    -->
+                <el-form-item :label="附件" >
+						<XJJAtt @setValue="setAtt" :infoId="infoId"  ref="childMethod"></XJJAtt>
+			    </el-form-item>
+			<el-form-item style="vertical-align: middle;text-align: center;border-top: 1px solid red; padding: 30px;" >
+						<el-button type="primary" @click.native="dosubmit">保存</el-button> <el-button  @click.native="hiddenDialog">取消</el-button>
+			    </el-form-item>
+		</el-form>
+		
+	</div>
+	
+</template>
+
+<script>
+	import {ctx} from '../global'
+	 import XJJInput from './form/input'
+	 import XJJSelect from './form/select'
+	 import XJJTextarea from './form/textarea'
+	 import XJJStatus from './form/status'
+	 import XJJProject from './form/project'
+	 import XJJPriority from './form/priority'
+	 import XJJModel from './form/model'
+	 import XJJDate from './form/date'
+	 import XJJDatetime from './form/datetime'
+	 import XJJHours from './form/hours'
+	 import XJJAddr from './form/addr'
+	 import XJJAtt from './att'
+	 
+	 
+	export default {
+	  name: 'XJJNewcase',
+	  props: {
+      tid: {
+        type: String,
+        default: ''
+      }
+    },
+	  components:{
+	  	XJJInput,XJJSelect,XJJTextarea,XJJStatus,XJJProject,XJJPriority,XJJModel,XJJDate,XJJDatetime,XJJHours,XJJAddr,XJJAtt 
+	  },
+	  data() {
+	  	var obj = new Object();
+	  	//
+	  	obj.form = new Object();
+	  	obj.form.caseTypeId = this.tid;
+	  	obj.form.attTokens = [];
+	  	obj.form.reportUserId = sessionStorage.getItem("userId");
+	  	obj.fields = [];
+	  	obj.typeName ="";
+	  	obj.loading = true;
+	  	obj.infoId = "";
+	  	
+	  	return obj;
+	  },
+  created:function(){
+  	//初始化
+  	if(this.tid==null || this.tid==""){
+  		this.tid = this.$route.query.tid;
+  	}
+  	var url = ctx+"/api/connuser/getCaseType.json?id="+this.tid;
+  	//alert(sessionStorage.getItem("userId"));
+	this.$http.get(url).then(res => {
+		var name = res.body.resultData.name;
+		var data  = res.body.resultData.caseTypeFields;
+		//alert(JSON.stringify(data));
+		this.fields = data;
+		this.typeName = name;
+		this.loading = false;
+		}, res => {
+				alert("获取数据失败");
+		});		
+  },
+  methods: {
+    getWId(wid){
+    	return eval(wid);
+    },
+    setValue(obj){
+    	var wid = obj.wid;
+    	var value = obj.value;
+    	var w = eval(wid+"=value");
+    	
+    	//w = value;
+    	//alert(JSON.stringify(this.form));
+    },
+    setAtt(fileTokens){
+    	//alert(JSON.stringify(fileTokens));
+    		this.form.attTokens = fileTokens;
+    },
+    hiddenDialog(){
+    	this.loading = false;
+    	this.form = new Object();
+    	this.$emit('closeDialog', {});
+    },
+    dosubmit(){
+    	//this.infoId = "66c36f08-b8d9-4873-b34a-f72c9771f1cb";
+    	//this.$refs.childMethod.upload(this.infoId);
+    	return;
+    	//alert(JSON.stringify(this.form));
+    	var formData = this.form;
+    
+    	if(formData.content==null ||  formData.content==""){
+    		alert("《内容》 不能为空。");
+    		return ;
+    	}else if(formData.reportUserId==null ||  formData.reportUserId==""){
+    		alert("没有登录！请先登录再保存问题。");
+    		return ;
+    	}else if(formData.caseTypeId==null ||  formData.caseTypeId==""){
+    		alert("没有选择问题类型，请选择一个问题类型。");
+    		return ;
+    	}
+    	//alert(JSON.stringify(formData));
+    	this.loading = true;
+    	//保持到服务器
+    	this.$http.post(ctx + "/api/connuser/saveCase",formData)
+				.then(res=>{
+					//alert(JSON.stringify(res));
+					var id = res.body.resultData.id;
+					this.hiddenDialog();
+				},res=>{
+					alert(JSON.stringify(res));
+				})
+				
+    },
+    
+  }
+}
+
+</script>
+
+<style scoped>
+  .el-table .info-row {
+    background: #c9e5f5;
+  }
+
+  .el-table .positive-row {
+    background: #e2f0e4;
+  }
+</style>

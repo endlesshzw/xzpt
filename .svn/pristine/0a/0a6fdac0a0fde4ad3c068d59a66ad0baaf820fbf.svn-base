@@ -1,0 +1,257 @@
+<template>
+	<div id="proTable" >
+		<el-table 
+		:data="tableData" 
+		style="width: 100%"
+		:height="getHight()"
+		@row-click="enterDetails" >
+		    </el-table-column>
+		    <el-table-column
+		      prop="projectName"
+		      label="项目"
+		      sortable
+		      @cell-click="goDetail"
+		     >
+		    </el-table-column>
+		    <el-table-column
+		      sortable
+		      prop="caseTypeName"
+		      label="类型"
+		      >
+		    </el-table-column>
+		    <el-table-column
+		      prop="content"
+		      width="200"
+		      :formatter="showContent"
+		      label="内容"
+		      >
+		    </el-table-column>
+		    <el-table-column width="138" prop="priority" sortable label="优先级">
+		    	<template scope="scope">
+		    		<el-rate
+		    		  :max="4"
+					  :value="changeNum(scope.row.priority)"
+					  disabled>
+					</el-rate>
+		    	</template>
+		    	<!--<template scope="scope">
+		    		<img src="../assets/img/2.png"/>
+		    	 	<img class="imgSize" :src="defineImg(scope.row.priority)"/>
+		    	</template>-->
+		    </el-table-column>
+		    <el-table-column
+		      prop="status"
+		      label="状态"
+		      sortable
+		     >
+		    </el-table-column>
+		    <el-table-column
+		      sortable
+		      prop="userCount"
+		      label="参与"
+		      :formatter="addRen"
+		      >
+		    </el-table-column>
+		    <el-table-column
+		      sortable
+		      prop="createdDate"
+		      label="创建时间"
+		     >
+		    </el-table-column>
+		    <el-table-column prop="percent" sortable label="耗时">
+		    	<template scope="scope">
+		    		<p>{{scope.row.consumeTimes[0]}}天{{scope.row.consumeTimes[1]}}小时{{scope.row.consumeTimes[2]}}分钟</p>
+		    	 	<el-progress 
+		    	 		:show-text="false"
+		    	 		:text-inside="true" 
+		    	 		:stroke-width="18" 
+		    	 		:percentage="scope.row.percent" 
+		    	 		:status="defineColor(scope.row.percent)"
+		    	 	>
+		    	 	</el-progress>
+		    	</template>
+		    </el-table-column>
+		    <el-table-column
+		      sortable
+		      prop="expectedDate"
+		      label="期望上线时间"
+		      :formatter="ifTimeNull"
+		      >
+		    </el-table-column>
+		    <el-table-column
+		      sortable
+		      prop="reportUserName"
+		      label="发起人"
+		      >
+		    </el-table-column>
+		</el-table>
+		<div style="height: 34px; background: #eef1f6;">
+			<el-pagination
+		      @size-change="handleSizeChange"
+		      @current-change="handleCurrentChange"
+		      :current-page="currentPage"
+		      :page-sizes="[10, 20, 30, 40]"
+		      :page-size="pageSize"
+		      layout="total, sizes, prev, pager, next, jumper"
+		      :total="totalCount">
+		    </el-pagination>
+		</div>
+	</div>
+</template>
+
+<script>
+	import {ctx} from '../global'
+	export default {
+		name: 'proTable',
+		props:["tabName","activeName","inputSearch"],
+		data() {
+			return {
+				name: "dassds",
+				userId: sessionStorage.getItem("userId"),
+				rUrl: ctx + '/api/connuser/list',
+				tableData: [],
+				currentPage: 1,   //默认当前页
+				pageSize: 20,     //默认每页显示数量
+				totalCount: 0, //默认数据总数
+				imgPath: []
+			}
+		
+		},
+		mounted:function(){
+			this.getData()
+		},
+		computed:{
+			skip: function(){
+				return this.pageSize*(this.currentPage-1)
+			}
+		},
+		watch: {
+			tabName: function(newTab){
+				this.currentPage = 1
+				this.getData()
+			}
+		},
+		methods:{
+			addRen(row, column, cellValue){
+				return row.userCount + "人"
+			},
+			getHight(){
+				let tableHeight = document.body.clientHeight - 135;
+				return tableHeight
+			},
+			goDetail(row, column, cell, event){
+				window.open("/details?id=" + row.id)
+			},
+			ifTimeNull(row, event, column){
+				if (column == null) {
+					return "无"
+				} else{
+					return column
+				}
+			},
+			enterDetails(row, event, column){//点击进入详情
+				this.$router.push({ name: 'Details', query: { id: row.id }})
+//				window.open("/details?id=" + row.id)
+			},
+			showContent(row, column, cellValue){//格式化内容
+				let content = row.content
+				if(content != null && content != "null" && content != ""){
+					content = content.replace(/<\/?.+?>/g,"");
+					content = content.replace(/ /g,"");
+					if(content.length > 40){
+						content = content.substring(0,40)+"...";
+					}
+				}else{
+					content = "";
+				}
+				return content
+			},
+			getData(){//获取数据
+				let obj = {
+					"skip": this.skip,
+					"pageSize": this.pageSize,
+					"queryObj": {
+						"type":this.tabName,
+						"title":""
+					}
+				}
+				
+				this.$http.post(this.rUrl,obj).then(res=>{
+					this.tableData = res['body']['resultData']['items']
+					this.totalCount = res['body']['resultData'].total
+					window.scrollTo(0, 0)
+	    		},res => {
+//	    				alert(JSON.stringify(res))
+	    		})
+
+			},
+			searchFunc(keyWord){//搜索
+				let obj = {"skip": this.skip,"pageSize": this.pageSize,"queryObj":{"type":this.tabName,"title": keyWord}}
+				let item = JSON.stringify(obj)
+				console.log(obj)
+				this.$http.post(this.rUrl, obj).then(res=>{  
+					this.tableData = res['body']['resultData']['items']
+					this.totalCount = res['body']['resultData'].total
+					window.scrollTo(0, 0)
+	    			},res => {
+	    				alert("获取数据失败")
+	    				console.log(JSON.stringify(res))
+	    		})
+			},
+			handleSizeChange(val) {//改变每页显示条数
+				this.pageSize = val
+				if (this.activeName == "") {
+					searchFunc(keyWord)
+				}else{
+					this.getData()
+				}
+		        window.scrollTo(0, 0)
+		        
+		    },
+		    handleCurrentChange(data) {//改变当前页数
+		        this.currentPage = data
+		        this.getData()
+		        window.scrollTo(0, 0)
+		    },
+		    defineColor(percent){//定义进度条颜色
+		    	if (percent>66) {
+		    		return 'exception'
+		    	}
+		    	if (percent<33) {
+		    		return 'success'
+		    	}else{
+		    		return ''
+		    	}
+		    },
+		    changeNum(num){//翻转优先级
+//		    	if (num == 1) {
+//		    		return 4
+//		    	}
+//		    	if (num == 2) {
+//		    		return 3
+//		    	}
+//		    	if (num == 3) {
+//		    		return 2
+//		    	}
+//		    	if (num == 4) {
+//		    		return 1
+//		    	}
+				return num
+		    }
+		}
+
+	}
+</script>
+
+<style>
+#mainTable .el-table__row{
+	height: 80px;
+}
+#proTable{
+	width: 90%;
+	margin: 0 auto;
+}
+/*.el-table__row{
+	cursor: pointer;
+}*/
+</style>

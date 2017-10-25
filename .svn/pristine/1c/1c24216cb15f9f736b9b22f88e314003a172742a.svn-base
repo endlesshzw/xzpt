@@ -1,0 +1,566 @@
+
+<!--
+	<option value="text">文本</option>
+                	<option value="title">标题</option>
+                	<option value="content">内容</option>
+                	<option value="select">下拉选择</option>
+                	<option value="priority">优先级</option>
+                	<option value="projectId">项目</option>
+                	<option value="moduleId">模块</option>
+                	<option value="reportTime">发生时间</option>
+                	<option value="expectedDate">期望完成时间</option>
+                	<option value="date">日期</option>
+                	<option value="dateTime">时间</option>
+                	<option value="sn">编号</option>siplt
+                	<option value="status">状态</option>
+                	<option value="addr">地址本</option>
+                	<option value="yaoqing">邀请</option>
+	
+	
+-->
+<template>
+	
+	<div class="dir" id="dir" style="padding: 30px;">
+		<h2 style="vertical-align: middle;text-align: center;border-bottom: 2px solid red;padding: 30px;">{{typeName}}</h2>
+		<el-form ref="form" label-width="80px" style="padding: 30px;">
+			<template  v-for="field of fields">
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：标题域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='title'" >
+						<el-input v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" :placeholder="'请输入'+field.name"   ></el-input>
+				</el-form-item>
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：文本域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='text'">
+						<el-input v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" :placeholder="'请输入'+field.name"></el-input>
+				</el-form-item>
+				
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：文本域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='chatContent'">
+						<el-input v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" :placeholder="'请输入'+field.name"></el-input>
+				</el-form-item>
+				
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：内容域
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='content'">
+						<el-input 
+						 v-bind:value="getWId('this.form.'+field.widgetId)" 
+						  @input="updateValue('this.form.'+field.widgetId,$event)"
+						  type="textarea"
+						  :rows="15"
+						  :placeholder="'请输入'+field.name">
+						</el-input>
+				</el-form-item>
+				
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：选择框
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='select'">
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in getOption(field.defaultValue)"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：选择框
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='status'">
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in statuss"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+			    </el-form-item>
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：选择框
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='caseType'">
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in caseTypes"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：有限级列表
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='priority'">
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)"  filterable :placeholder="'请选择'+field.name" >
+						    <el-option v-for="item in prioritys"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+			    </el-form-item>
+			    
+				<!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：项目列表
+                -->
+				<el-form-item :label="field.name" v-if="field.dataType=='projectId'">
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)" filterable  :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in projects"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：模块列表
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='moduleId'">
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)"  @input="updateValue('this.form.'+field.widgetId,$event)"  filterable :placeholder="'请选择'+field.name">
+						    <el-option v-for="item in modules"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：报告日期
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='reportTime'">
+						<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="datetime"
+						      	format="yyyy-MM-dd HH:mm"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：日期
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='date'">
+						<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="date"
+						      	format="yyyy-MM-dd"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>
+			    </el-form-item>
+			    
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：日期+时间
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='dateTime'">
+						<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="datetime"
+						      	format="yyyy-MM-dd HH:mm"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：时间
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='time'">
+			    	
+			    	<el-time-picker
+				   		v-bind:value="getWId('this.form.'+field.widgetId)"  
+						@input="updateDateValue('this.form.'+field.widgetId,$event)"
+					format="HH:mm"
+				    :placeholder="'选择'+field.name">
+				  </el-time-picker>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-11
+                	描述：预期日期
+                -->
+			    <el-form-item :label="field.name" v-if="field.dataType=='expectedDate'">
+						<el-date-picker 
+								v-bind:value="getWId('this.form.'+field.widgetId)"  
+								@input="updateDateValue('this.form.'+field.widgetId,$event)"
+						      	type="date"
+						      	format="yyyy-MM-dd"
+						      	:placeholder="'选择'+field.name">
+	    				</el-date-picker>
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-12
+                	描述：地址本
+                -->
+                <el-form-item :label="field.name" v-if="field.dataType=='addr'">
+						
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)" style="width: 100%;" @input="updateAddrValue('this.form.'+field.widgetId,$event)"  filterable multiple :placeholder="'请选择'+field.name" >
+						    <el-option v-for="item in users"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						
+			    </el-form-item>
+			    
+			    <!--
+                	作者：xjjuser@yeah.net
+                	时间：2017-09-12
+                	描述：邀请
+                -->
+                <el-form-item :label="field.name" v-if="field.dataType=='invitation'">
+						
+						<el-select  v-bind:value="getWId('this.form.'+field.widgetId)" style="width: 100%;" @input="updateAddrValue('this.form.'+field.widgetId,$event)"  filterable multiple :placeholder="'请选择'+field.name" >
+						    <el-option v-for="item in users"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						  </el-select>
+						
+			    </el-form-item>
+			    
+			    
+			</template>
+			
+			<el-form-item style="vertical-align: middle;text-align: center;border-top: 1px solid red; padding: 30px;" >
+						<el-button type="primary" @click.native="dosubmit">保存</el-button> <el-button>取消</el-button>
+			    </el-form-item>
+		</el-form>
+		
+	</div>
+	
+</template>
+
+<script>
+	import {ctx} from '../global'
+	export default {
+	  name: 'newcase',
+	  data() {
+	  	var tid = this.$route.query.tid;
+	  	var type = JSON.parse(localStorage[tid]);
+	  	var fields = type.caseTypeFields;
+	  	//alert(JSON.stringify(fields));
+	  	var obj = new Object();
+	  	obj.typeName = type.name;
+	  	var caseObj_ = new Object();
+	  	caseObj_.reportUserId=localStorage.getItem("userId"),
+	  	caseObj_.caseTypeId = type.id;
+	  	for(var i=0;i<fields.length;i++){
+			var field = fields[i];
+			//alert(field.widgetId)\
+			if(field.dataType=="yaoqing"){
+				eval("caseObj_."+field.widgetId+"=null");
+			}else{
+				eval("caseObj_."+field.widgetId+"=\"\"");
+			}
+		}
+	  	//alert(JSON.stringify(caseObj_));
+	  	obj.projects = null;
+	  	obj.modules = null;
+	  	obj.prioritys = null;
+	  	obj.statuss = null;
+	  	obj.fields = fields;
+	  	obj.users = null;
+	  	obj.caseTypes = null;
+	  	
+	  	//
+	  	obj.showError = false;
+	  	obj.errorMsg ="";
+	  	//alert(JSON.stringify(caseObj_));
+	  	
+	  	obj.form = caseObj_;
+	  	return obj;
+	  },
+  created:function(){
+  	//初始化
+  	//this.getCaseType();
+  	this.getProjectIds();
+  	this.getModuleIds();
+  	this.getPrioritys();
+  	this.getCaseStatuss();
+  	this.getAllUsers();
+  },
+  methods: {
+  	  getCaseTypes(){
+  	  	var url = ctx+"/api/connuser/getCaseTypes.json";
+				this.$http.post(url, {},{'emulateJSON': true}).then(res=>{
+					var data  = res.body.resultData;
+					//alert(JSON.stringify(data));
+					this.caseTypes = data;
+					//this.fields =data.caseTypeFields;
+	    			},res => {
+	    				alert("获取数据失败")
+	    		})
+  	  },
+  	  getCaseType(){
+  	  	var tid = this.$route.query.tid;
+	  	var url = ctx+"/api/connuser/getCaseType.json";
+		this.$http.post(url, {"id":tid},{'emulateJSON': true}).then(res=>{
+					var data  = res.body.resultData;
+					this.fields = data.caseTypeFields;
+					//alert(JSON.stringify(fields));
+			    	var caseObj_= new Object();
+				  	for(var i=0;i<this.fields.length;i++){
+						var field = this.fields[i];
+						//alert(JSON.stringify(field));
+						eval("caseObj_."+field.widgetId+"=\"\"");
+					}
+				  	//alert(JSON.stringify(caseObj_));
+					this.form = caseObj_;
+					//this.totalCount = res['body']['resultData'].total
+	    			},res => {
+	    				alert("获取数据失败")
+	    });
+  	  },
+    tableRowClassName(row, index) {
+      if (index === 1) {
+        return 'info-row';
+      } else if (index === 3) {
+        return 'positive-row';
+      }
+      return '';
+    },
+    getOption(str){
+    	var str_ = str.split(",");
+    	var opts = new Array();
+    	for(var i=0;i<str_.length;i++){
+    		var s = str_[i];
+    		var obj = new Object();
+    		obj.id=s;
+    		obj.name = s;
+    		opts.push(obj);
+    	}
+    	return opts;// [{id:'0',name:'0'},{id:'0',name:'0'}]
+    },
+    getCaseStatuss(){
+    	var url_ = ctx+"/api/connuser/getCaseStatuss.json";
+    		this.$http.post(url_, {},{'emulateJSON': true}).then(res=>{
+					var data  = res.body.resultData;
+					//alert(JSON.stringify(data));
+					this.statuss = data;
+					//this.caseType = data
+					//this.totalCount = res['body']['resultData'].total
+	    			},res => {
+	    				alert("获取数据失败")
+	    });
+    },
+    getPrioritys(){
+    	var url_ = ctx+"/api/connuser/getPriority.json";
+    		this.$http.post(url_, {},{'emulateJSON': true}).then(res=>{
+					var data  = res.body.resultData;
+					//alert(JSON.stringify(data));
+					this.prioritys = data;
+					//this.caseType = data
+					//this.totalCount = res['body']['resultData'].total
+	    			},res => {
+	    				alert("获取数据失败")
+	    });
+    },
+    getProjectIds(){
+    		var url_ = ctx+"/api/connuser/getProjects.json";
+    		this.$http.post(url_, {},{'emulateJSON': true}).then(res=>{
+					var data  = res.body;
+					//alert(JSON.stringify(data));
+					this.projects = data;
+					//this.caseType = data
+					//this.totalCount = res['body']['resultData'].total
+	    			},res => {
+	    				alert("获取数据失败")
+	    });
+    },
+    getModuleIds(){
+    	var url_ = ctx+"/api/connuser/getModules.json";
+    		this.$http.post(url_, {},{'emulateJSON': true}).then(res=>{
+					var data  = res.body;
+					//alert(JSON.stringify(data));
+					this.modules = data;
+					//this.caseType = data
+					//this.totalCount = res['body']['resultData'].total
+	    			},res => {
+	    				alert("获取数据失败")
+	    });
+    },
+    getAllUsers(){
+    	this.$http.post( ctx + "/api/connuser/getUsers")
+		  	  	.then(res=>{
+		  	  		var data  = res.body.resultData;
+		  	  		if(data.length>0){
+		  	  			this.users = data;
+		  	  		}
+		  	  		
+		  	  	},res=>{
+		  	  		alert("获取用户失败")
+		  	  	})
+    	
+    },
+    getWId(wid){
+    	return eval(wid);
+    },
+    updateValue(wid,value){
+    	//alert(wid+"--"+value);
+    	//value = "00927c66-a6c2-4d6d-8a52-f3e7966ab0a7";
+    	
+    	var obj = eval(wid+"='"+value+"'");
+    	
+    	//alert(obj);
+    	//obj ="00927c66-a6c2-4d6d-8a52-f3e7966ab0a7";
+    	//alert(obj);
+    },
+    updateDateValue(wid,value){
+    	eval(wid+"=value");
+    	
+    },
+    updateAddrValue(wid,value){
+    	//alert(wid+"--"+value);
+    	//value = "00927c66-a6c2-4d6d-8a52-f3e7966ab0a7";
+    	//alert((""+value).split(","));
+    	var obj  = new Array();
+    	if(value!=null){
+    		var vs = value.toString().split(",");
+    		for(var i=0;i<vs.length;i++){
+    			var uid = vs[i];
+    			if(uid!=null && uid.length>0){
+    				obj.push(uid);
+    			}
+    		}
+    	}
+    	eval(wid+"=obj");
+    	//
+    	//alert(obj);
+    	//obj ="00927c66-a6c2-4d6d-8a52-f3e7966ab0a7";
+    	//alert(obj);
+    },
+    formatDate(value){
+    	var fmt = "yyyy-MM-dd hh:mm:ss";
+	     var o = { 
+	        "M+" : value.getMonth()+1,                 //月份 
+	        "d+" : value.getDate(),                    //日 
+	        "h+" : value.getHours(),                   //小时 
+	        "m+" : value.getMinutes(),                 //分 
+	        "s+" : value.getSeconds(),                 //秒 
+	        "q+" : Math.floor((value.getMonth()+3)/3), //季度 
+	        "S"  : value.getMilliseconds()             //毫秒 
+	    }; 
+	    if(/(y+)/.test(fmt)) {
+	            fmt=fmt.replace(RegExp.$1, (value.getFullYear()+"").substr(4 - RegExp.$1.length)); 
+	    }
+	     for(var k in o) {
+	        if(new RegExp("("+ k +")").test(fmt)){
+	             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+	         }
+	     }
+    	//alert(fmt);
+    	return fmt;
+    },dosubmit(){
+    	var formData = new Object();
+    	formData.reportUserId = this.form.reportUserId;
+    	formData.caseTypeId= this.form.caseTypeId;
+    	for(var i=0;i<this.fields.length;i++){
+    		var field = this.fields[i];
+    		var wid = field.widgetId;
+    		var name = field.name;
+    		var dataType = field.dataType;
+    		var dateValue = eval("this.form."+wid);
+    		if(dataType=="reportTime" || dataType=="expectedDate" || dataType=="dateTime" || dataType=="date" || dataType=="time"){//日期必须转换为yyyy-MM-dd HH:mm:ss
+    			if(dateValue!=null && dateValue!=""){
+    				var v =	this.formatDate(dateValue);
+    				try{
+    					eval("formData."+wid+"='"+v+"'");
+    				}catch(e){
+    					alert("日期转换失败！");
+    				}
+    			}
+    		}else{
+    			eval("formData."+wid+"='"+dateValue+"'");
+    		}
+    	}
+    	
+    	if(formData.content==null ||  formData.content==""){
+    		alert("《内容》 不能为空。");
+    		return ;
+    	}else if(formData.reportUserId==null ||  formData.reportUserId==""){
+    		alert("没有登录！请先登录再保存问题。");
+    		return ;
+    	}else if(formData.caseTypeId==null ||  formData.caseTypeId==""){
+    		alert("没有选择问题类型，请选择一个问题类型。");
+    		return ;
+    	}
+    	//alert(JSON.stringify(formData));
+    	
+    	//保持到服务器
+    	this.$http.post(ctx + "/api/connuser/saveCase",formData)
+				.then(res=>{
+					self.close();
+					//alert(JSON.stringify(res));
+				},res=>{
+					alert(JSON.stringify(res));
+				})
+				
+    },
+    showErrorMsg(msg){
+    	this.showError = true;
+    	this.errorMsg = msg;
+    },
+    hiddeErrorMsg(){
+    	this.showError = false;
+    	this.errorMsg = "";
+    }
+  }
+}
+
+</script>
+
+<style scoped>
+  .el-table .info-row {
+    background: #c9e5f5;
+  }
+
+  .el-table .positive-row {
+    background: #e2f0e4;
+  }
+</style>

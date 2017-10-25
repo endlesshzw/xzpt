@@ -1,0 +1,329 @@
+<template>
+	<div class="dir" id="dir">
+		<div class="topTitle">
+			<span class="text">愉快的创建一个任务</span>
+			<el-button size="small" @click="goback">返回</el-button>
+		</div>
+		<form id="formID" action="" method="post">
+			<p class="formTitle redstar">项目</p>
+			<el-autocomplete class="projName" v-model="proj" :fetch-suggestions="querySearch" placeholder="请输入项目名称" @select="getProjId" :props='{value:"name",label:"name"}'></el-autocomplete>
+			<p class="formTitle redstar">类型</p>
+			<el-select v-model="typeValue" placeholder="选择类型">
+				<el-option v-for="(item,index) in allTypes" :key="item.id" :label="item.name" :value="item.id">
+				</el-option>
+			</el-select>
+			<p class="formTitle redstar">内容</p>
+			<el-input type="textarea" :rows="5" :maxlength="240" placeholder="请输入内容" v-model="content">
+			</el-input>
+			<p class="formTitle">优先级</p>
+			<el-select v-model="priorityValue" placeholder="选择优先级">
+				<el-option v-for="(item,index) in priorities" :key="item.id" :label="item.name" :value="item.id">
+				</el-option>
+			</el-select>
+			<p class="formTitle">期望上线时间</p>
+			<el-date-picker @change="getTime" v-model="dateValue" type="date" placeholder="选择日期" :picker-options="pickerOptions0">
+			</el-date-picker>
+			<!--<p class="formTitle">附件</p>	
+		   <el-upload
+			  class="upload-demo"
+			  action="https://jsonplaceholder.typicode.com/posts/"
+			  :on-preview="handlePreview"
+			  :on-remove="handleRemove"
+			  :file-list="fileList">
+			  <el-button id="upload" size="small" type="primary">点击上传</el-button>
+		   </el-upload>-->
+			<p class="formTitle">讨论</p>
+			<el-input type="textarea" :rows="4" placeholder="讨论内容" v-model="discuss">
+			</el-input>
+
+			<p class="formTitle">
+				邀请
+				<!--<el-button type="primary" size="small" @click="showAddressBook = true">地址本</el-button>-->
+			</p>
+			<!--<div class="choosenOne">
+				<el-tag v-for="(item, index) in choosenOne" type="primary" >{{item.name}}</el-tag>
+			</div>-->
+			  <el-select id="dzb" @change="change" placeholder="请输入邀请人" multiple filterable v-model="choosenAddress" multiple>
+			    <el-option
+			      v-for="item in address"
+			      :label="item.name"
+			      :value="item.id">
+			    </el-option>
+			  </el-select>
+			<!--<addressBook @getTargetData="getTargetData" @closeDia="closeDia" :showAddressBook.sync="showAddressBook"></addressBook>-->
+			<div class="createBtn">
+				<el-button id="create" type="primary" @click="okToCreateYo">&nbsp;&nbsp;创建&nbsp;&nbsp;</el-button>
+			</div>
+		</form>
+
+	</div>
+</template>
+
+<script>
+	import { ctx } from '../global'
+	import Bus from '../bus.js';
+	
+	export default {
+		components: {
+//			addressBook
+		},
+		data() {
+			return {
+				saveUsersUrl: "/api/connuser/saveCaseUser2",
+				selectProjId: '',
+				choosenOne: [],
+				showAddressBook: false,
+				address: [],
+				getProjsUrl: "/api/connuser/getProjects",
+				getTypesUrl: "/api/connuser/getAllCaseType",
+				allTypes: [],
+				proj: '',
+				projs: [], //项目  
+				typeValue: '',
+				content: '', //输入内容
+				priorityValue: "002",
+				pickerOptions0: { //日期
+					disabledDate(time) {
+						return time.getTime() < Date.now() - 8.64e7;
+					}
+				},
+				choosenAddress:[],
+				address: [],
+				dateValue: '',
+				priorities: [],
+				discuss: '', //讨论内容
+				fileList: [],
+				caseId: '',
+				newAddress: []
+			}
+		},
+		mounted: function() {
+			this.getUsers()
+			this.getProjs()
+			this.getAllCaseTypes()
+			this.getPriority()
+		},
+		activated(){
+//			this.proj = ""
+//			this.discuss = "";
+//			this.dateValue = "";
+//			this.priorityValue = "";
+//			this.content = "";
+//			this.typeValue ="";
+//			this.choosenAddress = [];
+//			this.selectProjId = "";
+		},
+		methods: {
+			getTime(date){
+				this.dateValue = date;
+			},
+			change(){
+				var value = this.choosenAddress;
+	    		var obj  = new Array();
+		    	if(value!=null){
+		    		var vs = value.toString().split(",");
+		    		for(var i=0;i<vs.length;i++){
+		    			var uid = vs[i];
+		    			if(uid!=null && uid.length>0){
+		    				for(var j=0;j<this.address.length;j++){
+		    					if(this.address[j].id === uid){
+		    						var uobj = new Object();
+		    						uobj.id=uid;
+		    						uobj.name = this.address[j].name;
+		    						obj.push(uobj);
+		    					}
+		    				}
+		    				
+		    			}
+		    		}
+		    	}
+		    	this.newAddress = obj;
+			},
+			getAllUsers(){//地址本获取用户
+		  	  	this.$http.post( ctx + "/api/connuser/getUsers")
+		  	  	.then(res=>{
+		  	  		let data = res['body']['resultData']
+		  	  		this.address = data
+		  	  	},res=>{
+//		  	  		alert("获取用户失败")
+		  	  	})
+		  	},
+			goback() {
+				this.$router.go(-1);
+			},
+			getProjId(obj) {
+				this.selectProjId = obj.id
+			},
+			okToCreateYo() {
+				if(this.typeValue == '' || this.content == '' || this.proj == '') {
+					this.$message('请完整填写必填项');
+				} else {
+					let priorityValue = this.priorityValue
+					let obj = {
+						chatContent: this.discuss,
+						expectedDate: this.dateValue,
+						priority: priorityValue,
+						invitation: this.newAddress,
+						content: this.content,
+						reportUserName: sessionStorage.getItem("userName"),
+						caseTypeId: this.typeValue,
+						reportUserId: sessionStorage.getItem("userId"),
+						projectId: this.selectProjId
+					}
+					this.$http.post(ctx + "/api/connuser/saveCase", obj)
+						.then(res => {
+							this.$message({
+								message: '录单成功！',
+								type: 'success'
+							});
+							this.$router.push({
+								name: 'Itemlist'
+							})
+							Bus.$emit('getList', event.target);
+//							let caseId = res['body']['resultData'].id
+//							this.caseId = caseId
+//							let newPeople = []
+//							for(let i = 0; i < this.choosenAddress.length; i++) {
+//								newPeople.push(this.choosenAddress[i])
+//							}
+//							let obj = {
+//								"caseId": caseId,
+//								"people": [],
+//								"newpeoples": newPeople
+//							}
+//							this.$http.post(ctx + this.saveUsersUrl, obj)
+//								.then(res => {
+//									this.$message({
+//										message: '保存成功',
+//										type: 'success'
+//									});
+//									if(this.discuss != "") {
+//										let url = ctx + '/api/connuser/saveComment?caseId=';
+//										this.$http.get(url + this.caseId + '&content=' + this.discuss).then(response => {
+//
+//										}, response => {
+//											alert("discussFailed!");
+//										})
+//									}
+//								}, res => {
+//
+//								})
+							
+						}, res => {
+					})
+				}
+
+			},
+			getPriority() {
+				this.$http.post(ctx + "/api/connuser/getPriority")
+					.then(res => {
+						this.priorities = res['body']['resultData']
+					}, res => {
+
+					})
+			},
+			querySearch(queryString, cb) {
+				let projs = this.projs
+				let results = queryString ? projs.filter(this.createFilter(queryString)) : projs
+				cb(results)
+			},
+			createFilter(queryString) {
+				return(projs) => {
+					return(projs.name.indexOf(queryString.toLowerCase()) === 0)
+				}
+			},
+			getProjs() {
+				this.$http.post(ctx + this.getProjsUrl)
+					.then(res => {
+						this.projs = res['body']
+					}, res => {
+
+					})
+			},
+			getAllCaseTypes() {
+				this.$http.post(ctx + this.getTypesUrl)
+					.then(res => {
+						this.allTypes = res['body']['resultData']
+					}, res => {
+
+					})
+			},
+			getTargetData(val) {
+				this.choosenOne = val
+			},
+			closeDia(val) {
+				this.showAddressBook = val
+			},
+			getUsers() {
+				this.$http.post(ctx + "/api/connuser/getUsers")
+					.then(res => {
+						let data = res['body']['resultData']
+						this.address = data
+					}, res => {
+//						alert("获取用户失败")
+					})
+			},
+			handleRemove(file, fileList) {
+				console.log(file, fileList);
+			},
+			handlePreview(file) {
+				console.log(file);
+			}
+		}
+	}
+</script>
+
+<style scoped>
+	.projName{
+		width: 100%;
+	}
+	.choosenOne span {
+		margin: 4px;
+	}
+	
+	.choosenOne span {
+		font-size: 16px;
+	}
+	
+	.choosenOne {
+		border: 1px solid #bfcbd9;
+		padding: 10px;
+		border-radius: 10px;
+	}
+	
+	.trans {
+		margin-top: 20px;
+		padding-left: 270px;
+	}
+	
+	.showPerson {
+		height: 20px;
+	}
+	
+	@import "../assets/css/banma.css";
+	.createBtn {
+		padding-bottom: 50px;
+	}
+	
+	#upload,
+	#create {
+		background-color: #40C19A;
+		border: none;
+	}
+	
+	.topTitle {
+		position: initial;
+	}
+</style>
+<style type="text/css">
+	#dir .el-select{
+		width: 100%;
+	}
+	#dir .el-transfer-panel {
+		width: 40%;
+	}
+	
+	#dir .el-transfer__buttons {
+		width: 15%;
+	}
+</style>

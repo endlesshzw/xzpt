@@ -1,0 +1,107 @@
+<template>
+	<!-- <ul>
+		<li  v-for="(caseLog,index) in logLists" :index="index">
+			<div class="item_log">
+				
+				<span class="leftfloat"> {{ caseLog.userName }} </span>
+				<div id='log_content' v-if="caseLog.opt=='修改'" class="leftfloat">
+					<div><span>修改了{{caseLog.optType}}</span></div>
+					<div><span style="text-decoration:line-through">{{caseLog.oldContent}}</span>修改为<span>{{caseLog.newContent}}</span></div>
+				</div>
+				<div class="leftfloat"><span>{{caseLog.createdDate}}</span></div>
+			</div>
+			<div style="clear: both;"></div>
+		</li>
+	</ul> -->
+	 <el-table :data="logLists"  style="width: 100%" :row-class-name="tableRowClassName">
+    <el-table-column
+      prop="userName"
+      label="姓名"
+      width="180">
+    </el-table-column>
+    <el-table-column
+      prop="opt"
+      label="操作"
+      width="200">
+      <template scope="scope1">
+		    		<span>{{scope1.row.opt}}{{scope1.row.optType}}</span>
+		    	</template>
+    </el-table-column>
+    <el-table-column
+      prop=""
+      label="详细"
+      width="600"
+      >
+       <template scope="scope2">
+       <div v-if="scope2.row.opt=='修改'">
+       	<span style="color:#20a0ff">{{scope2.row.oldContent}}</span>
+		    		<span>修改为</span>
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+       <div v-else-if="scope2.row.opt=='参与'">
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+        <div v-else-if="scope2.row.opt=='取消参与'">
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+       <div v-else-if="scope2.row.opt=='添加'">
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+        <div v-else-if="scope2.row.opt=='删除'">
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+         <div v-else-if="scope2.row.opt=='评论'">
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+        <div v-else-if="scope2.row.opt=='回复'">
+		    		<span style="color:#20a0ff">{{scope2.row.newContent}}</span>
+       </div>
+		    	</template>
+    </el-table-column>
+    <el-table-column
+      prop="createdDate"
+      label="操作时间"
+      >
+    </el-table-column>
+  </el-table>
+</template>
+
+<script>
+	import {ctx} from '../global'
+	import Bus from '../bus.js';
+	export default {
+        name: 'workLog',
+        data () {
+        return {
+        item: '?caseId=' + this.$route.query.id,
+        logListUrl:ctx + '/api/connuser/getWorkLogLists',
+        logLists:[],
+        defaultImg: 'this.src="' + require('../assets/img/noPic.png') + '"'
+        }
+    },
+		created(){
+			Bus.$on('getTarget', target => {  
+	            this.getCaseLogLists();  
+	        }); 
+		},
+        mounted:function(){
+			this.getCaseLogLists();
+		},
+		methods:{
+			getCaseLogLists:function(){
+					this.$http.get(this.logListUrl + this.item).then(response=>{        
+	    			let caseLogData = response['body']['resultData']		
+	    			this.logLists = caseLogData
+	    			alert(JSON.stringify(logLists));
+				},response => {
+					alert("获取数据失败");
+				})
+			}
+		}
+}
+
+</script>
+
+<style>
+	
+</style>

@@ -1,0 +1,93 @@
+<template>
+	<div id="timetable" class="rightfloat" style="margin-bottom: 32px;">
+    	<ul class="timeTable">
+    		<li>
+    				<span class="span1">创建时间</span><span> {{ showTimes.createdDate }} </span>
+    			
+    			
+    		</li>
+    		<li>
+    			
+    				<span class="span1">期望上线时间</span>
+	    			<span> {{ showTimes.expectedDate }}&nbsp;</span>
+    			
+	    			
+    		</li>
+    		<li>
+    				<span class="span1">完成时间</span>
+	    			<span> {{ showTimes.finishDate }}&nbsp;</span>
+    			
+	    			
+    		</li>
+    		<li class="last-li">
+    				<span class="span1 last-span">耗时</span>
+	    			<span> 
+	    				<p>{{showTimes.consumeTimes[0]}}天{{showTimes.consumeTimes[1]}}小时{{showTimes.consumeTimes[2]}}分钟</p>
+		    			<div class="">
+		    				<el-progress
+		    					:text-inside="true" 
+		    					:stroke-width="18" 
+		    					:status="showColor(showTimes.percent)" 
+		    					:percentage="showTimes.percent">
+		    				</el-progress> 
+		    			</div>
+	    			</span>
+    			
+    		</li>
+    		<!--<li>
+    			<span class="span1">创建时间</span>
+    			<span class="span2">期望上线时间</span>
+    			<span class="span3">完成时间</span>
+    			<span class="span4">耗时</span>
+    		</li>
+    		<li>
+    			<span> {{ showTimes.createdDate }} </span>
+    			<span> {{ showTimes.expectedDate }}&nbsp;</span>
+    			<span> {{ showTimes.finishDate }}&nbsp;</span>
+    			<span> 
+    				<el-progress :text-inside="true" :stroke-width="18" :status="showColor(showTimes.percent)" :percentage="showTimes.percent"></el-progress> 
+    			</span>
+    		</li>-->
+    	</ul>
+    </div>
+</template>
+
+<script>
+	export default {
+		name: 'timetable',
+		created:function(){
+			
+		},
+		props: ['showTimes'],   //从父组件中接收数据的方法
+		methods:{
+			showColor: function(percent){
+				if (percent>66) {
+		    		return 'exception'
+		    	}
+		    	if (percent<33) {
+		    		return 'success'
+		    	}else{
+		    		return ''
+		    	}
+			}
+		}
+	}
+</script>
+
+<style>
+	#timetable .last-span{
+		line-height: 70px;
+	}
+	#timetable .last-li{
+		height: 70px;
+	}
+	#timetable .el-progress-bar__outer{
+		background-color: #cccccc;
+	}
+	#timetable{
+		margin-right: 100px;
+		margin-top: 39px;
+		background-color: #eee;
+	}
+	@import "../assets/css/banma.css";
+</style>
